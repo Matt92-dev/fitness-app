@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weekly Workout & Meal Plan Carousel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    /* Carousel container */
+    .carousel {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      gap: 20px;
+      padding-bottom: 20px;
+    }
+    /* Each tile */
+    .tile {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      flex: 0 0 90%;
+      max-width: 350px;
+      scroll-snap-align: center;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .tile h2 {
+      margin-top: 0;
+      color: #2c3e50;
+    }
+    .summary {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .summary p {
+      margin: 4px 0;
+    }
+    .tracking {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .tracking label {
+      cursor: pointer;
+    }
+    .view-button {
+      display: block;
+      margin: 10px auto;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background: rgba(0, 0, 0, 0.7);
+    }
+    .modal-content {
+      background: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      position: relative;
+    }
+    .close {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .save-buttons {
+      text-align: center;
+      margin-top: 20px;
+    }
+    button {
+      margin: 5px;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Weekly Workout & Meal Plan</h1>
+  <div class="carousel">
+    <!-- Monday Tile -->
+    <div class="tile" id="mondayTile">
+      <h2>Monday</h2>
+      <div class="summary">
+        <p><strong>Workout:</strong> Gym Session (Full-Body, 1 hour)</p>
+        <p>Warm-up, compound movements, arm focus, cool-down.</p>
+        <p><strong>Meals:</strong> Muesli with Milk, Egg & Bacon Sandwich, Grilled Chicken with Sweet Potato Mash</p>
+      </div>
+      <div class="tracking">
+        <label>
+          <input type="checkbox" id="monday_workout"> Workout Completed
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" id="monday_meals"> Meal Plan Followed
+        </label>
+      </div>
+      <button class="view-button" onclick="showModal('mondayModal')">View Full Details</button>
+    </div>
+    
+    <!-- Tuesday Tile -->
+    <div class="tile" id="tuesdayTile">
+      <h2>Tuesday</h2>
+      <div class="summary">
+        <p><strong>Workout:</strong> Office Day: Cardio & Mobility</p>
+        <p>30–45 minute run or HIIT/home circuit, plus 10–15 minutes stretching/yoga.</p>
+        <p><strong>Meals:</strong> Muesli with Milk, Egg & Bacon Sandwich, Grilled Chicken with Sweet Potato Mash</p>
+      </div>
+      <div class="tracking">
+        <label>
+          <input type="checkbox" id="tuesday_workout"> Cardio/Mobility Completed
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" id="tuesday_meals"> Meal Plan Followed
+        </label>
+      </div>
+      <button class="view-button" onclick="showModal('tuesdayModal')">View Full Details</button>
+    </div>
+    
+    <!-- Wednesday Tile -->
+    <div class="tile" id="wednesdayTile">
+      <h2>Wednesday</h2>
+      <div class="summary">
+        <p><strong>Workout:</strong> Office Day: Active Recovery</p>
+        <p>Gentle activity (brisk walk) plus 15–20 minutes of stretching/yoga.</p>
+        <p><strong>Meals:</strong> Muesli with Milk, Egg & Bacon Sandwich, Grilled Chicken with Sweet Potato Mash</p>
+      </div>
+      <div class="tracking">
+        <label>
+          <input type="checkbox" id="wednesday_workout"> Active Recovery Completed
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" id="wednesday_meals"> Meal Plan Followed
+        </label>
+      </div>
+      <button class="view-button" onclick="showModal('wednesdayModal')">View Full Details</button>
+    </div>
+    
+    <!-- Thursday Tile -->
+    <div class="tile" id="thursdayTile">
+      <h2>Thursday</h2>
+      <div class="summary">
+        <p><strong>Workout:</strong> Gym Session (Full-Body, 1 hour)</p>
+        <p>Dynamic warm-up, compound movements, arm focus, cool-down.</p>
+        <p><strong>Meals:</strong> Muesli with Milk, Egg & Bacon Sandwich, Grilled Chicken with Sweet Potato Mash</p>
+      </div>
+      <div class="tracking">
+        <label>
+          <input type="checkbox" id="thursday_workout"> Workout Completed
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" id="thursday_meals"> Meal Plan Followed
+        </label>
+      </div>
+      <button class="view-button" onclick="showModal('thursdayModal')">View Full Details</button>
+    </div>
+    
+    <!-- Friday Tile -->
+    <div class="tile" id="fridayTile">
+      <h2>Friday</h2>
+      <div class="summary">
+        <p><strong>Workout:</strong> Gym Session (Full-Body, 1 hour)</p>
+        <p>Light cardio warm-up, compound movements, arm focus, cool-down.</p>
+        <p><strong>Meals:</strong> Muesli with Milk, Egg & Bacon Sandwich, Grilled Chicken with Sweet Potato Mash</p>
+      </div>
+      <div class="tracking">
+        <label>
+          <input type="checkbox" id="friday_workout"> Workout Completed
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" id="friday_meals"> Meal Plan Followed
+        </label>
+      </div>
+      <button class="view-button" onclick="showModal('fridayModal')">View Full Details</button>
+    </div>
+    
+    <!-- Saturday Tile -->
+    <div class="tile" id="saturdayTile">
+      <h2>Saturday</h2>
+      <div class="summary">
+        <p><strong>Workout:</strong> Cardio & Optional Home Circuit</p>
+        <p>30–45 minute run or brisk walk; optional bodyweight circuit; full-body stretching.</p>
+        <p><strong>Meals:</strong> Muesli with Milk, Egg & Bacon Sandwich, Grilled Chicken with Sweet Potato Mash</p>
+      </div>
+      <div class="tracking">
+        <label>
+          <input type="checkbox" id="saturday_workout"> Workout Completed
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" id="saturday_meals"> Meal Plan Followed
+        </label>
+      </div>
+      <button class="view-button" onclick="showModal('saturdayModal')">View Full Details</button>
+    </div>
+    
+    <!-- Sunday Tile -->
+    <div class="tile" id="sundayTile">
+      <h2>Sunday</h2>
+      <div class="summary">
+        <p><strong>Workout:</strong> Rest or Light Recovery</p>
+        <p>Complete rest or gentle activity (leisurely walk, restorative yoga).</p>
+        <p><strong>Meals:</strong> Muesli with Milk, Egg & Bacon Sandwich, Grilled Chicken with Sweet Potato Mash</p>
+      </div>
+      <div class="tracking">
+        <label>
+          <input type="checkbox" id="sunday_workout"> Recovery Completed
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" id="sunday_meals"> Meal Plan Followed
+        </label>
+      </div>
+      <button class="view-button" onclick="showModal('sundayModal')">View Full Details</button>
+    </div>
+  </div>
+  
+  <div class="save-buttons">
+    <button onclick="saveAllProgress()">Save All Progress</button>
+    <button onclick="resetAllProgress()">Reset All Progress</button>
+  </div>
+  
+  <!-- Modals for each day -->
+  <!-- Monday Modal -->
+  <div id="mondayModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('mondayModal')">&times;</span>
+      <h2>Monday – Full Breakdown</h2>
+      <h3>Workout:</h3>
+      <p><strong>Gym Session (Full-Body, 1 hour)</strong></p>
+      <ul>
+        <li><strong>Warm-up:</strong> 5 minutes of light cardio (treadmill or cycle)</li>
+        <li><strong>Compound Movements:</strong>
+          <ul>
+            <li>Squats: 3 sets of 8–10 reps</li>
+            <li>Bench Press: 3 sets of 8–10 reps</li>
+            <li>Bent-Over Rows: 3 sets of 8–10 reps</li>
+          </ul>
+        </li>
+        <li><strong>Arm Focus:</strong>
+          <ul>
+            <li>Dumbbell Bicep Curls: 3 sets of 10–12 reps</li>
+            <li>Triceps Dips or Cable Extensions: 3 sets of 10–12 reps</li>
+          </ul>
+        </li>
+        <li><strong>Cool-down:</strong> 5 minutes of stretching</li>
+      </ul>
+      <h3>Meals:</h3>
+      <p><strong>Breakfast:</strong> Muesli with Milk</p>
+      <p><strong>Lunch:</strong> Egg & Bacon Sandwich</p>
+      <p><strong>Dinner:</strong> Grilled Chicken with Sweet Potato Mash</p>
+    </div>
+  </div>
+  
+  <!-- Tuesday Modal -->
+  <div id="tuesdayModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('tuesdayModal')">&times;</span>
+      <h2>Tuesday – Full Breakdown</h2>
+      <h3>Workout:</h3>
+      <p><strong>Office Day: Cardio & Mobility</strong></p>
+      <ul>
+        <li>Option 1: Brisk 30–45 minute run (before or after work)</li>
+        <li>Option 2: Home-based HIIT or bodyweight circuit (20–30 minutes)</li>
+        <li>Additional: 10–15 minute stretching or yoga routine</li>
+      </ul>
+      <h3>Meals:</h3>
+      <p><strong>Breakfast:</strong> Muesli with Milk</p>
+      <p><strong>Lunch:</strong> Egg & Bacon Sandwich</p>
+      <p><strong>Dinner:</strong> Grilled Chicken with Sweet Potato Mash</p>
+    </div>
+  </div>
+  
+  <!-- Wednesday Modal -->
+  <div id="wednesdayModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('wednesdayModal')">&times;</span>
+      <h2>Wednesday – Full Breakdown</h2>
+      <h3>Workout:</h3>
+      <p><strong>Office Day: Active Recovery</strong></p>
+      <ul>
+        <li>Focus: Gentle activity such as a brisk walk</li>
+        <li>Additional: 15–20 minutes of stretching or yoga targeting major muscle groups</li>
+      </ul>
+      <h3>Meals:</h3>
+      <p><strong>Breakfast:</strong> Muesli with Milk</p>
+      <p><strong>Lunch:</strong> Egg & Bacon Sandwich</p>
+      <p><strong>Dinner:</strong> Grilled Chicken with Sweet Potato Mash</p>
+    </div>
+  </div>
+  
+  <!-- Thursday Modal -->
+  <div id="thursdayModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('thursdayModal')">&times;</span>
+      <h2>Thursday – Full Breakdown</h2>
+      <h3>Workout:</h3>
+      <p><strong>Gym Session (Full-Body, 1 hour)</strong></p>
+      <ul>
+        <li><strong>Warm-up:</strong> 5 minutes of dynamic movements</li>
+        <li><strong>Compound Movements:</strong>
+          <ul>
+            <li>Deadlifts: 3 sets of 6–8 reps</li>
+            <li>Overhead Press: 3 sets of 8–10 reps</li>
+            <li>Pull-Ups or Lat Pulldowns: 3 sets of 8–10 reps</li>
+          </ul>
+        </li>
+        <li><strong>Arm Focus:</strong>
+          <ul>
+            <li>Hammer Curls: 3 sets of 10–12 reps</li>
+            <li>Skull Crushers: 3 sets of 10–12 reps</li>
+          </ul>
+        </li>
+        <li><strong>Cool-down:</strong> 5 minutes of stretching</li>
+      </ul>
+      <h3>Meals:</h3>
+      <p><strong>Breakfast:</strong> Muesli with Milk</p>
+      <p><strong>Lunch:</strong> Egg & Bacon Sandwich</p>
+      <p><strong>Dinner:</strong> Grilled Chicken with Sweet Potato Mash</p>
+    </div>
+  </div>
+  
+  <!-- Friday Modal -->
+  <div id="fridayModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('fridayModal')">&times;</span>
+      <h2>Friday – Full Breakdown</h2>
+      <h3>Workout:</h3>
+      <p><strong>Gym Session (Full-Body, 1 hour)</strong></p>
+      <ul>
+        <li><strong>Warm-up:</strong> 5 minutes of light cardio</li>
+        <li><strong>Compound Movements:</strong>
+          <ul>
+            <li>Leg Press or Walking Lunges: 3 sets of 10–12 reps</li>
+            <li>Incline Dumbbell Press: 3 sets of 8–10 reps</li>
+            <li>Seated Row: 3 sets of 8–10 reps</li>
+          </ul>
+        </li>
+        <li><strong>Arm Focus:</strong>
+          <ul>
+            <li>Concentration or Cable Curls: 3 sets of 10–12 reps</li>
+            <li>Triceps Pushdowns: 3 sets of 10–12 reps</li>
+          </ul>
+        </li>
+        <li><strong>Cool-down:</strong> 5 minutes of stretching</li>
+      </ul>
+      <h3>Meals:</h3>
+      <p><strong>Breakfast:</strong> Muesli with Milk</p>
+      <p><strong>Lunch:</strong> Egg & Bacon Sandwich</p>
+      <p><strong>Dinner:</strong> Grilled Chicken with Sweet Potato Mash</p>
+    </div>
+  </div>
+  
+  <!-- Saturday Modal -->
+  <div id="saturdayModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('saturdayModal')">&times;</span>
+      <h2>Saturday – Full Breakdown</h2>
+      <h3>Workout:</h3>
+      <p><strong>Cardio & Optional Home Circuit</strong></p>
+      <ul>
+        <li>Cardio: 30–45 minute run or mix of running and brisk walking</li>
+        <li>Optional: Short bodyweight circuit (e.g., push-ups, planks, squats)</li>
+        <li>Cool-down: Full-body stretching</li>
+      </ul>
+      <h3>Meals:</h3>
+      <p><strong>Breakfast:</strong> Muesli with Milk</p>
+      <p><strong>Lunch:</strong> Egg & Bacon Sandwich</p>
+      <p><strong>Dinner:</strong> Grilled Chicken with Sweet Potato Mash</p>
+    </div>
+  </div>
+  
+  <!-- Sunday Modal -->
+  <div id="sundayModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('sundayModal')">&times;</span>
+      <h2>Sunday – Full Breakdown</h2>
+      <h3>Workout:</h3>
+      <p><strong>Rest or Light Recovery</strong></p>
+      <ul>
+        <li>Complete rest or gentle activity (leisurely walk, restorative yoga)</li>
+      </ul>
+      <h3>Meals:</h3>
+      <p><strong>Breakfast:</strong> Muesli with Milk</p>
+      <p><strong>Lunch:</strong> Egg & Bacon Sandwich</p>
+      <p><strong>Dinner:</strong> Grilled Chicken with Sweet Potato Mash</p>
+    </div>
+  </div>
+  
+  <script>
+    function showModal(id) {
+      document.getElementById(id).style.display = "block";
+    }
+    function closeModal(id) {
+      document.getElementById(id).style.display = "none";
+    }
+    
+    function saveAllProgress() {
+      const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+      days.forEach(day => {
+        localStorage.setItem(day + '_workout', document.getElementById(day + '_workout').checked);
+        localStorage.setItem(day + '_meals', document.getElementById(day + '_meals').checked);
+      });
+      alert("Progress saved!");
+    }
+    
+    function resetAllProgress() {
+      const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+      days.forEach(day => {
+        localStorage.removeItem(day + '_workout');
+        localStorage.removeItem(day + '_meals');
+        document.getElementById(day + '_workout').checked = false;
+        document.getElementById(day + '_meals').checked = false;
+      });
+      alert("Progress reset!");
+    }
+    
+    window.onload = function() {
+      const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+      days.forEach(day => {
+        document.getElementById(day + '_workout').checked = (localStorage.getItem(day + '_workout') === 'true');
+        document.getElementById(day + '_meals').checked = (localStorage.getItem(day + '_meals') === 'true');
+      });
+    };
+  </script>
+</body>
+</html>
