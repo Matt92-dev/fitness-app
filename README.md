@@ -66,3 +66,4 @@ Each push to `main` will build the app and deploy it automatically.
 - The Vite config uses a relative base path, which keeps deployment simple on GitHub Pages.
 - Progress is stored in local storage in the browser.
 - If you later want data sync across devices, Supabase would be a strong next step.
+- This is line is to trigger a test deployment
