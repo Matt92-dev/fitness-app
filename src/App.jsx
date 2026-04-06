@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { weeklyPlan } from "./data";
 
 const STORAGE_KEY = "fitness-tracker-progress-v1";
@@ -25,6 +25,8 @@ function getInitialProgress() {
 function App() {
   const [progress, setProgress] = useState(getInitialProgress);
   const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedExercise, setSelectedExercise] = useState(null);
+  const carouselRef = useRef(null);
   const completedDays = Object.values(progress).filter(
     (entry) => entry.workout && entry.meals
   ).length;
@@ -32,6 +34,45 @@ function App() {
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
   }, [progress]);
+
+  useEffect(() => {
+    if (!selectedDay) {
+      setSelectedExercise(null);
+      return;
+    }
+
+    const firstExercise = selectedDay.detailSections
+      .flatMap((section) => section.items)
+      .find((item) => typeof item === "object");
+
+    setSelectedExercise(firstExercise ?? null);
+  }, [selectedDay]);
+
+  useEffect(() => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return undefined;
+    }
+
+    const handleWheel = (event) => {
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) {
+        return;
+      }
+
+      event.preventDefault();
+      carousel.scrollBy({
+        left: event.deltaY,
+        behavior: "smooth"
+      });
+    };
+
+    carousel.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      carousel.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
 
   const toggleProgress = (day, type) => {
     setProgress((current) => ({
@@ -45,6 +86,11 @@ function App() {
 
   const resetAllProgress = () => {
     setProgress(getInitialProgress());
+  };
+
+  const closeWorkoutModal = () => {
+    setSelectedDay(null);
+    setSelectedExercise(null);
   };
 
   return (
@@ -70,7 +116,7 @@ function App() {
       </header>
 
       <main>
-        <section className="carousel" aria-label="Weekly plan">
+        <section className="carousel" aria-label="Weekly plan" ref={carouselRef}>
           {weeklyPlan.map((item) => {
             const status = progress[item.day];
             const dayKey = item.day.toLowerCase();
@@ -117,7 +163,7 @@ function App() {
                 </div>
 
                 <button className="primary-button" onClick={() => setSelectedDay(item)}>
-                  View full details
+                  View workout
                 </button>
               </article>
             );
@@ -126,9 +172,9 @@ function App() {
       </main>
 
       {selectedDay ? (
-        <div className="modal-backdrop" onClick={() => setSelectedDay(null)}>
+        <div className="modal-backdrop" onClick={closeWorkoutModal}>
           <div
-            className="modal-card"
+            className="modal-card workout-modal"
             onClick={(event) => event.stopPropagation()}
             role="dialog"
             aria-modal="true"
@@ -136,37 +182,81 @@ function App() {
           >
             <button
               className="close-button"
-              onClick={() => setSelectedDay(null)}
+              onClick={closeWorkoutModal}
               aria-label="Close details"
             >
               x
             </button>
 
             <h2 id="modal-title">{selectedDay.detailTitle}</h2>
-            <h3>Workout</h3>
             <p className="detail-lead">{selectedDay.detailWorkout}</p>
+            <p className="coaching-note">{selectedDay.coachingNote}</p>
 
-            {selectedDay.detailSections.map((section, index) => (
-              <div className="detail-section" key={`${selectedDay.day}-${index}`}>
-                {section.title ? <h4>{section.title}</h4> : null}
-                <ul>
-                  {section.items.map((line) => (
-                    <li key={line}>{line}</li>
-                  ))}
-                </ul>
+            <div className="workout-layout">
+              <div className="workout-plan">
+                {selectedDay.detailSections.map((section, index) => (
+                  <div className="detail-section" key={`${selectedDay.day}-${index}`}>
+                    {section.title ? <h3>{section.title}</h3> : null}
+                    <div className="exercise-list">
+                      {section.items.map((item) =>
+                        typeof item === "string" ? (
+                          <div className="info-row" key={item}>
+                            {item}
+                          </div>
+                        ) : (
+                          <button
+                            className={
+                              selectedExercise?.name === item.name
+                                ? "exercise-button active"
+                                : "exercise-button"
+                            }
+                            key={item.name}
+                            onClick={() => setSelectedExercise(item)}
+                            type="button"
+                          >
+                            <span className="exercise-name">{item.name}</span>
+                            <span className="exercise-meta">{item.sets}</span>
+                          </button>
+                        )
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
 
-            <h3>Meals</h3>
-            <p>
-              <strong>Breakfast:</strong> {selectedDay.meals.breakfast}
-            </p>
-            <p>
-              <strong>Lunch:</strong> {selectedDay.meals.lunch}
-            </p>
-            <p>
-              <strong>Dinner:</strong> {selectedDay.meals.dinner}
-            </p>
+              <aside className="exercise-preview">
+                {selectedExercise ? (
+                  <>
+                    <img
+                      className="exercise-image"
+                      src={selectedExercise.image}
+                      alt={selectedExercise.name}
+                    />
+                    <p className="exercise-preview-label">Selected exercise</p>
+                    <h3>{selectedExercise.name}</h3>
+                    <p className="exercise-sets">{selectedExercise.sets}</p>
+                    <p>{selectedExercise.instructions}</p>
+                    <div className="cue-list">
+                      {selectedExercise.cues.map((cue) => (
+                        <span className="cue-chip" key={cue}>
+                          {cue}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="exercise-alt">
+                      <strong>Alternative:</strong> {selectedExercise.alternatives}
+                    </p>
+                  </>
+                ) : (
+                  <div className="empty-preview">
+                    <h3>Workout overview</h3>
+                    <p>
+                      This day is more open-ended, so use the notes on the left as your guide.
+                    </p>
+                  </div>
+                )}
+              </aside>
+            </div>
           </div>
         </div>
       ) : null}

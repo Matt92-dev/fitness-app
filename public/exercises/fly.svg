@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#f7f4ed"/>
+  <rect x="48" y="48" width="704" height="504" rx="32" fill="#ffffff" stroke="#d6deeb" stroke-width="4"/>
+  <circle cx="250" cy="170" r="38" fill="#14213d"/>
+  <rect x="220" y="208" width="60" height="138" rx="28" fill="#14213d"/>
+  <path d="M220 240 C160 200 120 225 95 270" fill="none" stroke="#fca311" stroke-width="20" stroke-linecap="round"/>
+  <path d="M280 240 C340 200 380 225 405 270" fill="none" stroke="#fca311" stroke-width="20" stroke-linecap="round"/>
+  <rect x="82" y="267" width="26" height="34" rx="8" fill="#415a77"/>
+  <rect x="392" y="267" width="26" height="34" rx="8" fill="#415a77"/>
+  <text x="450" y="250" fill="#14213d" font-family="Segoe UI, Arial, sans-serif" font-size="50" font-weight="700">Fly</text>
+  <text x="450" y="320" fill="#415a77" font-family="Segoe UI, Arial, sans-serif" font-size="28">Stretch the chest and squeeze inward.</text>
+</svg>

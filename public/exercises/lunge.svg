@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#eef3f8"/>
+  <rect x="48" y="48" width="704" height="504" rx="32" fill="#ffffff" stroke="#d6deeb" stroke-width="4"/>
+  <circle cx="250" cy="155" r="36" fill="#14213d"/>
+  <rect x="220" y="194" width="58" height="126" rx="28" fill="#14213d"/>
+  <path d="M240 320 L195 430 L180 500" stroke="#415a77" stroke-width="28" stroke-linecap="round"/>
+  <path d="M260 320 L340 360 L405 500" stroke="#415a77" stroke-width="28" stroke-linecap="round"/>
+  <path d="M215 230 L170 285 M285 230 L340 255" stroke="#fca311" stroke-width="20" stroke-linecap="round"/>
+  <text x="455" y="250" fill="#14213d" font-family="Segoe UI, Arial, sans-serif" font-size="50" font-weight="700">Lunge</text>
+  <text x="455" y="320" fill="#415a77" font-family="Segoe UI, Arial, sans-serif" font-size="28">Stay balanced and drive through the front leg.</text>
+</svg>

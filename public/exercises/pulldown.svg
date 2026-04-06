@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#f7f4ed"/>
+  <rect x="48" y="48" width="704" height="504" rx="32" fill="#ffffff" stroke="#d6deeb" stroke-width="4"/>
+  <rect x="180" y="100" width="18" height="360" rx="9" fill="#415a77"/>
+  <rect x="166" y="94" width="220" height="18" rx="9" fill="#14213d"/>
+  <circle cx="270" cy="210" r="38" fill="#14213d"/>
+  <rect x="242" y="248" width="56" height="120" rx="28" fill="#14213d"/>
+  <path d="M220 250 L185 175 M320 250 L355 175" stroke="#fca311" stroke-width="20" stroke-linecap="round"/>
+  <rect x="152" y="155" width="236" height="16" rx="8" fill="#fca311"/>
+  <text x="450" y="250" fill="#14213d" font-family="Segoe UI, Arial, sans-serif" font-size="50" font-weight="700">Pulldown</text>
+  <text x="450" y="320" fill="#415a77" font-family="Segoe UI, Arial, sans-serif" font-size="28">Drive elbows down, not just hands.</text>
+</svg>

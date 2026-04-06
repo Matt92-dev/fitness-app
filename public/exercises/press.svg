@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#f7f4ed"/>
+  <rect x="48" y="48" width="704" height="504" rx="32" fill="#ffffff" stroke="#d6deeb" stroke-width="4"/>
+  <circle cx="220" cy="210" r="42" fill="#14213d"/>
+  <rect x="190" y="255" width="60" height="136" rx="28" fill="#14213d"/>
+  <rect x="120" y="260" width="170" height="22" rx="11" fill="#fca311"/>
+  <rect x="86" y="250" width="24" height="40" rx="8" fill="#14213d"/>
+  <rect x="300" y="250" width="24" height="40" rx="8" fill="#14213d"/>
+  <rect x="185" y="390" width="22" height="110" rx="11" fill="#415a77"/>
+  <rect x="233" y="390" width="22" height="110" rx="11" fill="#415a77"/>
+  <text x="400" y="250" fill="#14213d" font-family="Segoe UI, Arial, sans-serif" font-size="54" font-weight="700">Press</text>
+  <text x="400" y="320" fill="#415a77" font-family="Segoe UI, Arial, sans-serif" font-size="28">Drive the weight up with control.</text>
+</svg>

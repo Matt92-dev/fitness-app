@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#f7f4ed"/>
+  <rect x="48" y="48" width="704" height="504" rx="32" fill="#ffffff" stroke="#d6deeb" stroke-width="4"/>
+  <path d="M230 150 L230 360 C230 390 210 420 210 460" stroke="#14213d" stroke-width="30" stroke-linecap="round"/>
+  <path d="M310 150 L310 340 C310 395 355 420 365 470" stroke="#14213d" stroke-width="30" stroke-linecap="round"/>
+  <rect x="162" y="470" width="120" height="22" rx="11" fill="#fca311"/>
+  <rect x="322" y="470" width="120" height="22" rx="11" fill="#fca311"/>
+  <text x="455" y="250" fill="#14213d" font-family="Segoe UI, Arial, sans-serif" font-size="50" font-weight="700">Calves</text>
+  <text x="455" y="320" fill="#415a77" font-family="Segoe UI, Arial, sans-serif" font-size="28">Use full range and pause at the top.</text>
+</svg>

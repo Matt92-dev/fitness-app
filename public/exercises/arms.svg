@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#f7f4ed"/>
+  <rect x="48" y="48" width="704" height="504" rx="32" fill="#ffffff" stroke="#d6deeb" stroke-width="4"/>
+  <circle cx="245" cy="168" r="38" fill="#14213d"/>
+  <rect x="215" y="206" width="60" height="144" rx="28" fill="#14213d"/>
+  <path d="M214 248 C160 220 145 275 182 318" fill="none" stroke="#fca311" stroke-width="22" stroke-linecap="round"/>
+  <path d="M276 248 C330 220 345 275 308 318" fill="none" stroke="#fca311" stroke-width="22" stroke-linecap="round"/>
+  <rect x="165" y="304" width="24" height="32" rx="8" fill="#415a77"/>
+  <rect x="301" y="304" width="24" height="32" rx="8" fill="#415a77"/>
+  <path d="M235 350 L215 500 M255 350 L275 500" stroke="#415a77" stroke-width="28" stroke-linecap="round"/>
+  <text x="430" y="250" fill="#14213d" font-family="Segoe UI, Arial, sans-serif" font-size="50" font-weight="700">Arms</text>
+  <text x="430" y="320" fill="#415a77" font-family="Segoe UI, Arial, sans-serif" font-size="28">Keep elbows steady and chase the squeeze.</text>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#eef3f8"/>
+  <rect x="48" y="48" width="704" height="504" rx="32" fill="#ffffff" stroke="#d6deeb" stroke-width="4"/>
+  <circle cx="240" cy="175" r="40" fill="#14213d"/>
+  <path d="M220 220 L310 280 L350 245" fill="none" stroke="#14213d" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M308 280 L255 390 L225 500" fill="none" stroke="#415a77" stroke-width="28" stroke-linecap="round"/>
+  <path d="M308 280 L355 392 L382 500" fill="none" stroke="#415a77" stroke-width="28" stroke-linecap="round"/>
+  <rect x="328" y="214" width="92" height="18" rx="9" fill="#fca311"/>
+  <rect x="417" y="205" width="18" height="36" rx="9" fill="#14213d"/>
+  <rect x="310" y="205" width="18" height="36" rx="9" fill="#14213d"/>
+  <text x="455" y="250" fill="#14213d" font-family="Segoe UI, Arial, sans-serif" font-size="54" font-weight="700">Row</text>
+  <text x="455" y="320" fill="#415a77" font-family="Segoe UI, Arial, sans-serif" font-size="28">Pull the elbow back and squeeze.</text>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#eef3f8"/>
+  <rect x="48" y="48" width="704" height="504" rx="32" fill="#ffffff" stroke="#d6deeb" stroke-width="4"/>
+  <circle cx="220" cy="220" r="34" fill="#14213d"/>
+  <rect x="220" y="248" width="200" height="34" rx="17" fill="#14213d"/>
+  <rect x="170" y="285" width="60" height="24" rx="12" fill="#415a77"/>
+  <rect x="410" y="285" width="60" height="24" rx="12" fill="#415a77"/>
+  <rect x="170" y="220" width="24" height="70" rx="12" fill="#fca311"/>
+  <text x="455" y="250" fill="#14213d" font-family="Segoe UI, Arial, sans-serif" font-size="50" font-weight="700">Core</text>
+  <text x="455" y="320" fill="#415a77" font-family="Segoe UI, Arial, sans-serif" font-size="28">Brace hard and stay controlled.</text>
+</svg>

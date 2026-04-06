@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#eef3f8"/>
+  <rect x="48" y="48" width="704" height="504" rx="32" fill="#ffffff" stroke="#d6deeb" stroke-width="4"/>
+  <circle cx="250" cy="170" r="38" fill="#14213d"/>
+  <rect x="220" y="208" width="60" height="140" rx="28" fill="#14213d"/>
+  <path d="M220 240 L120 180 M280 240 L380 180" stroke="#fca311" stroke-width="22" stroke-linecap="round"/>
+  <rect x="92" y="165" width="24" height="32" rx="8" fill="#415a77"/>
+  <rect x="384" y="165" width="24" height="32" rx="8" fill="#415a77"/>
+  <path d="M238 348 L215 500 M262 348 L285 500" stroke="#415a77" stroke-width="28" stroke-linecap="round"/>
+  <text x="450" y="250" fill="#14213d" font-family="Segoe UI, Arial, sans-serif" font-size="50" font-weight="700">Raise</text>
+  <text x="450" y="320" fill="#415a77" font-family="Segoe UI, Arial, sans-serif" font-size="28">Lift out wide with relaxed traps.</text>
+</svg>

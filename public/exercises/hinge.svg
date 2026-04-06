@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#f7f4ed"/>
+  <rect x="48" y="48" width="704" height="504" rx="32" fill="#ffffff" stroke="#d6deeb" stroke-width="4"/>
+  <circle cx="250" cy="155" r="36" fill="#14213d"/>
+  <path d="M220 195 L320 260 L375 260" fill="none" stroke="#14213d" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M250 250 L230 420 L210 500" stroke="#415a77" stroke-width="28" stroke-linecap="round"/>
+  <path d="M320 260 L330 420 L345 500" stroke="#415a77" stroke-width="28" stroke-linecap="round"/>
+  <rect x="355" y="246" width="110" height="18" rx="9" fill="#fca311"/>
+  <rect x="464" y="236" width="20" height="38" rx="9" fill="#14213d"/>
+  <rect x="336" y="236" width="20" height="38" rx="9" fill="#14213d"/>
+  <text x="470" y="250" fill="#14213d" font-family="Segoe UI, Arial, sans-serif" font-size="50" font-weight="700">Hinge</text>
+  <text x="470" y="320" fill="#415a77" font-family="Segoe UI, Arial, sans-serif" font-size="28">Push hips back and keep the weight close.</text>
+</svg>
