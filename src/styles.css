@@ -207,22 +207,60 @@ input {
   color: #14213d;
 }
 
-.modal-backdrop {
+.screen-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(20, 33, 61, 0.52);
-  display: grid;
-  place-items: center;
-  padding: 20px;
+  padding: 0;
+  z-index: 30;
 }
 
-.modal-card {
-  width: min(680px, 100%);
-  max-height: min(90vh, 900px);
+.screen-sheet {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at top left, rgba(255, 196, 61, 0.12), transparent 26%),
+    linear-gradient(180deg, #f7f4ed 0%, #eef3f8 100%);
   overflow: auto;
-  border-radius: 28px;
-  padding: 24px;
-  position: relative;
+  padding: 18px 18px 32px;
+}
+
+.screen-sheet-front {
+  z-index: 1;
+}
+
+.screen-header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+
+.screen-header h2 {
+  margin: 4px 0 0;
+}
+
+.screen-kicker {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  color: #7a5c00;
+}
+
+.nav-button {
+  border: 0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #14213d;
+  padding: 10px 14px;
+  box-shadow: 0 10px 24px rgba(20, 33, 61, 0.08);
+}
+
+.screen-content {
+  display: grid;
+  gap: 18px;
 }
 
 .close-button {
@@ -247,31 +285,16 @@ input {
   color: #415a77;
 }
 
-.workout-modal {
-  width: min(960px, 100%);
-}
-
-.workout-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
-  gap: 22px;
-  margin-top: 24px;
-}
-
-.workout-plan,
-.exercise-preview {
+.detail-section,
+.log-card,
+.exercise-screen {
   background: rgba(247, 250, 252, 0.9);
   border: 1px solid rgba(20, 33, 61, 0.08);
   border-radius: 24px;
   padding: 18px;
 }
 
-.detail-section + .detail-section {
-  margin-top: 18px;
-}
-
-.detail-section h3,
-.exercise-preview h3 {
+.detail-section h3 {
   margin: 0 0 12px;
 }
 
@@ -347,6 +370,46 @@ input {
   background: #eef3f8;
 }
 
+.log-card {
+  padding: 14px;
+}
+
+.log-card.muted {
+  background: #f8fafc;
+}
+
+.log-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.log-field {
+  display: grid;
+  gap: 6px;
+  color: #415a77;
+  font-size: 0.95rem;
+}
+
+.log-field input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(20, 33, 61, 0.12);
+  border-radius: 14px;
+  background: #ffffff;
+  color: #14213d;
+}
+
+.log-field input:focus {
+  outline: 2px solid rgba(252, 163, 17, 0.35);
+  border-color: #fca311;
+}
+
+.previous-week {
+  margin: 0;
+  color: #415a77;
+}
+
 .cue-list {
   display: flex;
   flex-wrap: wrap;
@@ -362,12 +425,6 @@ input {
   font-size: 0.9rem;
 }
 
-.empty-preview {
-  display: grid;
-  align-content: start;
-  min-height: 100%;
-}
-
 @media (max-width: 720px) {
   .app-shell {
     width: min(100% - 20px, 1200px);
@@ -381,9 +438,5 @@ input {
   .carousel {
     --tile-width: min(320px, 84vw);
     gap: 14px;
-  }
-
-  .workout-layout {
-    grid-template-columns: 1fr;
   }
 }

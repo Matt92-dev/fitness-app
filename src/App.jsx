@@ -2,6 +2,36 @@ import { useEffect, useRef, useState } from "react";
 import { weeklyPlan } from "./data";
 
 const STORAGE_KEY = "fitness-tracker-progress-v1";
+const WORKOUT_LOGS_KEY = "fitness-tracker-workout-logs-v1";
+const DAY_NAMES = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday"
+];
+
+function getWeekKey(date = new Date()) {
+  const current = new Date(date);
+  const day = (current.getDay() + 6) % 7;
+  current.setHours(0, 0, 0, 0);
+  current.setDate(current.getDate() + 3 - day);
+  const firstThursday = new Date(current.getFullYear(), 0, 4);
+  const firstThursdayDay = (firstThursday.getDay() + 6) % 7;
+  firstThursday.setDate(firstThursday.getDate() + 3 - firstThursdayDay);
+  const diff = current - firstThursday;
+  const week = 1 + Math.round(diff / 604800000);
+
+  return `${current.getFullYear()}-W${String(week).padStart(2, "0")}`;
+}
+
+function getPreviousWeekKey(date = new Date()) {
+  const previous = new Date(date);
+  previous.setDate(previous.getDate() - 7);
+  return getWeekKey(previous);
+}
 
 function getInitialProgress() {
   const emptyState = weeklyPlan.reduce((accumulator, day) => {
@@ -22,11 +52,28 @@ function getInitialProgress() {
   }
 }
 
+function getInitialWorkoutLogs() {
+  const saved = window.localStorage.getItem(WORKOUT_LOGS_KEY);
+
+  if (!saved) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(saved);
+  } catch {
+    return {};
+  }
+}
+
 function App() {
   const [progress, setProgress] = useState(getInitialProgress);
+  const [workoutLogs, setWorkoutLogs] = useState(getInitialWorkoutLogs);
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedExercise, setSelectedExercise] = useState(null);
   const carouselRef = useRef(null);
+  const currentWeekKey = getWeekKey();
+  const previousWeekKey = getPreviousWeekKey();
   const completedDays = Object.values(progress).filter(
     (entry) => entry.workout && entry.meals
   ).length;
@@ -36,17 +83,8 @@ function App() {
   }, [progress]);
 
   useEffect(() => {
-    if (!selectedDay) {
-      setSelectedExercise(null);
-      return;
-    }
-
-    const firstExercise = selectedDay.detailSections
-      .flatMap((section) => section.items)
-      .find((item) => typeof item === "object");
-
-    setSelectedExercise(firstExercise ?? null);
-  }, [selectedDay]);
+    window.localStorage.setItem(WORKOUT_LOGS_KEY, JSON.stringify(workoutLogs));
+  }, [workoutLogs]);
 
   useEffect(() => {
     const carousel = carouselRef.current;
@@ -74,6 +112,37 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return undefined;
+    }
+
+    const today = DAY_NAMES[new Date().getDay()];
+    const activeCard = carousel.querySelector(`[data-day="${today}"]`);
+
+    if (!activeCard) {
+      return undefined;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      activeCard.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center"
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedDay) {
+      setSelectedExercise(null);
+    }
+  }, [selectedDay]);
+
   const toggleProgress = (day, type) => {
     setProgress((current) => ({
       ...current,
@@ -88,10 +157,41 @@ function App() {
     setProgress(getInitialProgress());
   };
 
-  const closeWorkoutModal = () => {
+  const updateExerciseLog = (day, exerciseName, field, value) => {
+    setWorkoutLogs((current) => ({
+      ...current,
+      [currentWeekKey]: {
+        ...current[currentWeekKey],
+        [day]: {
+          ...current[currentWeekKey]?.[day],
+          [exerciseName]: {
+            ...current[currentWeekKey]?.[day]?.[exerciseName],
+            [field]: value
+          }
+        }
+      }
+    }));
+  };
+
+  const openWorkoutDay = (day) => {
+    setSelectedDay(day);
+    setSelectedExercise(null);
+  };
+
+  const closeWorkoutFlow = () => {
     setSelectedDay(null);
     setSelectedExercise(null);
   };
+
+  const selectedExerciseLog =
+    selectedDay && selectedExercise
+      ? workoutLogs[currentWeekKey]?.[selectedDay.day]?.[selectedExercise.name] ?? {}
+      : {};
+
+  const previousExerciseLog =
+    selectedDay && selectedExercise
+      ? workoutLogs[previousWeekKey]?.[selectedDay.day]?.[selectedExercise.name] ?? null
+      : null;
 
   return (
     <div className="app-shell">
@@ -122,7 +222,7 @@ function App() {
             const dayKey = item.day.toLowerCase();
 
             return (
-              <article className="tile" key={item.day}>
+              <article className="tile" key={item.day} data-day={item.day}>
                 <div className="tile-header">
                   <h2>{item.day}</h2>
                   <span className={status.workout && status.meals ? "badge done" : "badge"}>
@@ -162,7 +262,7 @@ function App() {
                   </label>
                 </div>
 
-                <button className="primary-button" onClick={() => setSelectedDay(item)}>
+                <button className="primary-button" onClick={() => openWorkoutDay(item)}>
                   View workout
                 </button>
               </article>
@@ -172,92 +272,137 @@ function App() {
       </main>
 
       {selectedDay ? (
-        <div className="modal-backdrop" onClick={closeWorkoutModal}>
-          <div
-            className="modal-card workout-modal"
-            onClick={(event) => event.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="modal-title"
-          >
-            <button
-              className="close-button"
-              onClick={closeWorkoutModal}
-              aria-label="Close details"
-            >
-              x
-            </button>
-
-            <h2 id="modal-title">{selectedDay.detailTitle}</h2>
-            <p className="detail-lead">{selectedDay.detailWorkout}</p>
-            <p className="coaching-note">{selectedDay.coachingNote}</p>
-
-            <div className="workout-layout">
-              <div className="workout-plan">
-                {selectedDay.detailSections.map((section, index) => (
-                  <div className="detail-section" key={`${selectedDay.day}-${index}`}>
-                    {section.title ? <h3>{section.title}</h3> : null}
-                    <div className="exercise-list">
-                      {section.items.map((item) =>
-                        typeof item === "string" ? (
-                          <div className="info-row" key={item}>
-                            {item}
-                          </div>
-                        ) : (
-                          <button
-                            className={
-                              selectedExercise?.name === item.name
-                                ? "exercise-button active"
-                                : "exercise-button"
-                            }
-                            key={item.name}
-                            onClick={() => setSelectedExercise(item)}
-                            type="button"
-                          >
-                            <span className="exercise-name">{item.name}</span>
-                            <span className="exercise-meta">{item.sets}</span>
-                          </button>
-                        )
-                      )}
-                    </div>
-                  </div>
-                ))}
+        <div className="screen-backdrop">
+          <section className="screen-sheet" role="dialog" aria-modal="true">
+            <header className="screen-header">
+              <button className="nav-button" onClick={closeWorkoutFlow} type="button">
+                Back
+              </button>
+              <div>
+                <p className="screen-kicker">Workout plan</p>
+                <h2>{selectedDay.day}</h2>
               </div>
+            </header>
 
-              <aside className="exercise-preview">
-                {selectedExercise ? (
-                  <>
-                    <img
-                      className="exercise-image"
-                      src={selectedExercise.image}
-                      alt={selectedExercise.name}
-                    />
-                    <p className="exercise-preview-label">Selected exercise</p>
-                    <h3>{selectedExercise.name}</h3>
-                    <p className="exercise-sets">{selectedExercise.sets}</p>
-                    <p>{selectedExercise.instructions}</p>
-                    <div className="cue-list">
-                      {selectedExercise.cues.map((cue) => (
-                        <span className="cue-chip" key={cue}>
-                          {cue}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="exercise-alt">
-                      <strong>Alternative:</strong> {selectedExercise.alternatives}
-                    </p>
-                  </>
-                ) : (
-                  <div className="empty-preview">
-                    <h3>Workout overview</h3>
-                    <p>
-                      This day is more open-ended, so use the notes on the left as your guide.
-                    </p>
+            <div className="screen-content">
+              <p className="detail-lead">{selectedDay.detailWorkout}</p>
+              <p className="coaching-note">{selectedDay.coachingNote}</p>
+
+              {selectedDay.detailSections.map((section, index) => (
+                <div className="detail-section" key={`${selectedDay.day}-${index}`}>
+                  {section.title ? <h3>{section.title}</h3> : null}
+                  <div className="exercise-list">
+                    {section.items.map((item) =>
+                      typeof item === "string" ? (
+                        <div className="info-row" key={item}>
+                          {item}
+                        </div>
+                      ) : (
+                        <button
+                          className="exercise-button"
+                          key={item.name}
+                          onClick={() => setSelectedExercise(item)}
+                          type="button"
+                        >
+                          <span className="exercise-name">{item.name}</span>
+                          <span className="exercise-meta">{item.sets}</span>
+                        </button>
+                      )
+                    )}
                   </div>
-                )}
-              </aside>
+                </div>
+              ))}
             </div>
-          </div>
+          </section>
+
+          {selectedExercise ? (
+            <section className="screen-sheet screen-sheet-front" role="dialog" aria-modal="true">
+              <header className="screen-header">
+                <button className="nav-button" onClick={() => setSelectedExercise(null)} type="button">
+                  Back
+                </button>
+                <div>
+                  <p className="screen-kicker">Exercise details</p>
+                  <h2>{selectedExercise.name}</h2>
+                </div>
+              </header>
+
+              <div className="screen-content exercise-screen">
+                <img
+                  className="exercise-image"
+                  src={selectedExercise.image}
+                  alt={selectedExercise.name}
+                />
+                <p className="exercise-sets">{selectedExercise.sets}</p>
+                <p>{selectedExercise.instructions}</p>
+                <div className="cue-list">
+                  {selectedExercise.cues.map((cue) => (
+                    <span className="cue-chip" key={cue}>
+                      {cue}
+                    </span>
+                  ))}
+                </div>
+                <div className="log-card">
+                  <p className="exercise-preview-label">This week</p>
+                  <div className="log-grid">
+                    {selectedExercise.tracking.weight ? (
+                      <label className="log-field">
+                        <span>Weight</span>
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          placeholder="e.g. 22.5kg"
+                          value={selectedExerciseLog.weight ?? ""}
+                          onChange={(event) =>
+                            updateExerciseLog(
+                              selectedDay.day,
+                              selectedExercise.name,
+                              "weight",
+                              event.target.value
+                            )
+                          }
+                        />
+                      </label>
+                    ) : null}
+                    {selectedExercise.tracking.reps ? (
+                      <label className="log-field">
+                        <span>Reps</span>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          placeholder="e.g. 8, 8, 7"
+                          value={selectedExerciseLog.reps ?? ""}
+                          onChange={(event) =>
+                            updateExerciseLog(
+                              selectedDay.day,
+                              selectedExercise.name,
+                              "reps",
+                              event.target.value
+                            )
+                          }
+                        />
+                      </label>
+                    ) : null}
+                  </div>
+                </div>
+                <div className="log-card muted">
+                  <p className="exercise-preview-label">Previous week</p>
+                  {previousExerciseLog?.weight || previousExerciseLog?.reps ? (
+                    <p className="previous-week">
+                      {previousExerciseLog.weight ? `Weight: ${previousExerciseLog.weight}` : ""}
+                      {previousExerciseLog.weight && previousExerciseLog.reps ? " | " : ""}
+                      {previousExerciseLog.reps ? `Reps: ${previousExerciseLog.reps}` : ""}
+                    </p>
+                  ) : (
+                    <p className="previous-week">No data saved for last week yet.</p>
+                  )}
+                </div>
+                <p className="exercise-alt">
+                  <strong>Alternative:</strong> {selectedExercise.alternatives}
+                </p>
+              </div>
+            </section>
+          ) : null}
         </div>
       ) : null}
     </div>

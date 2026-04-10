@@ -4,8 +4,16 @@ const mealPlan = {
   dinner: "Grilled Chicken with Sweet Potato Mash"
 };
 
-function lift(name, sets, image, cues, instructions, alternatives) {
-  return { name, sets, image, cues, instructions, alternatives };
+function lift(
+  name,
+  sets,
+  image,
+  cues,
+  instructions,
+  alternatives,
+  tracking = { weight: true, reps: true }
+) {
+  return { name, sets, image, cues, instructions, alternatives, tracking };
 }
 
 export const weeklyPlan = [
@@ -164,7 +172,8 @@ export const weeklyPlan = [
             "/exercises/core.svg",
             ["Ribs down", "Glutes squeezed", "Keep body in one line"],
             "Make it hard by bracing hard rather than simply surviving the clock.",
-            "Dead bug"
+            "Dead bug",
+            { weight: false, reps: false }
           )
         ]
       }
@@ -236,12 +245,12 @@ export const weeklyPlan = [
             "Neutral-grip pulldown"
           ),
           lift(
-            "Incline Machine or Dumbbell Press",
+            "Flat Dumbbell Press",
             "3 x 8-10",
             "/exercises/press.svg",
-            ["Shoulder blades set", "Control the stretch", "Press through full range"],
-            "This is support work, so chase quality reps more than load.",
-            "Incline smith press"
+            ["Shoulder blades set", "Control the stretch", "Press smoothly to full lockout"],
+            "This gives you chest volume without repeating the same incline pattern from Monday.",
+            "Weighted push-ups"
           ),
           lift(
             "Single-Arm Dumbbell Row",
@@ -350,7 +359,8 @@ export const weeklyPlan = [
             "/exercises/core.svg",
             ["Brace first", "Move with control", "Do not swing"],
             "Finish with deliberate core work rather than racing through the reps.",
-            "Reverse crunch"
+            "Reverse crunch",
+            { weight: false, reps: true }
           )
         ]
       }
