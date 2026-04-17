@@ -167,13 +167,13 @@ export const weeklyPlan = [
             "Leg press calf raise"
           ),
           lift(
-            "Plank",
-            "3 x 45-60 sec",
+            "Cable Crunches",
+            "3 x 10-15",
             "/exercises/core.svg",
-            ["Ribs down", "Glutes squeezed", "Keep body in one line"],
-            "Make it hard by bracing hard rather than simply surviving the clock.",
-            "Dead bug",
-            { weight: false, reps: false }
+            ["Curl ribs toward hips", "Keep hips still", "Control the return"],
+            "Use a full crunch rather than just leaning forward. This should feel like direct ab work, not a rope pulldown.",
+            "Machine crunch",
+            { weight: true, reps: true }
           )
         ]
       }
@@ -354,11 +354,11 @@ export const weeklyPlan = [
             "Standing calf raise"
           ),
           lift(
-            "Hanging Knee Raises or Cable Crunches",
+            "Hanging Knee Raises",
             "3 x 12-15",
             "/exercises/core.svg",
             ["Brace first", "Move with control", "Do not swing"],
-            "Finish with deliberate core work rather than racing through the reps.",
+            "Curl the pelvis up at the top instead of just lifting your knees halfway. Keep momentum low.",
             "Reverse crunch",
             { weight: false, reps: true }
           )
