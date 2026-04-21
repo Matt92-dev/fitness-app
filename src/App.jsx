@@ -328,11 +328,6 @@ function App() {
               </header>
 
               <div className="screen-content exercise-screen">
-                <img
-                  className="exercise-image"
-                  src={selectedExercise.image}
-                  alt={selectedExercise.name}
-                />
                 <p className="exercise-sets">{selectedExercise.sets}</p>
                 <p>{selectedExercise.instructions}</p>
                 <div className="cue-list">
@@ -400,6 +395,13 @@ function App() {
                 <p className="exercise-alt">
                   <strong>Alternative:</strong> {selectedExercise.alternatives}
                 </p>
+                <button
+                  className="save-button"
+                  onClick={() => setSelectedExercise(null)}
+                  type="button"
+                >
+                  Save exercise
+                </button>
               </div>
             </section>
           ) : null}
