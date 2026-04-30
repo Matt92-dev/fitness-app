@@ -407,6 +407,7 @@ input {
   border-radius: 14px;
   background: #ffffff;
   color: #14213d;
+  font-size: 16px;
 }
 
 .log-field input:focus {

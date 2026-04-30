@@ -21,14 +21,14 @@ export const weeklyPlan = [
     day: "Monday",
     workoutLabel: "Workout Completed",
     mealsLabel: "Meal Plan Followed",
-    workoutSummary: "Upper A (Gym, 1 hour)",
+    workoutSummary: "Upper Push (Gym, 1 hour)",
     workoutDescription:
-      "Horizontal push and pull focus with shoulders and arms to start the week strong.",
+      "Chest, shoulders, and triceps focus to start the week with your heaviest pushing work.",
     mealsSummary:
       "Muesli with Milk, Egg & Bacon Sandwich, Grilled Chicken with Sweet Potato Mash",
     detailTitle: "Monday - Workout Plan",
-    detailWorkout: "Upper A",
-    coachingNote: "Aim for smooth reps and leave one or two reps in reserve on the compounds.",
+    detailWorkout: "Upper Push",
+    coachingNote: "Start the week by pushing hard on the big compounds, then chase clean upper-body volume.",
     detailSections: [
       {
         title: "Warm-up",
@@ -106,72 +106,80 @@ export const weeklyPlan = [
     day: "Tuesday",
     workoutLabel: "Workout Completed",
     mealsLabel: "Meal Plan Followed",
-    workoutSummary: "Lower A (Gym, 1 hour)",
+    workoutSummary: "Upper Pull (Gym, 1 hour)",
     workoutDescription:
-      "Quad-focused lower body session with hinge work, calves, and a short core finish.",
+      "Back, rear delts, and biceps focus with plenty of pulling volume for upper-body growth.",
     mealsSummary:
       "Muesli with Milk, Egg & Bacon Sandwich, Grilled Chicken with Sweet Potato Mash",
     detailTitle: "Tuesday - Workout Plan",
-    detailWorkout: "Lower A",
-    coachingNote: "Stay disciplined on rest times so the lower session fits neatly into the hour.",
+    detailWorkout: "Upper Pull",
+    coachingNote: "Focus on controlled pulling and let your back do the work rather than rushing the reps.",
     detailSections: [
       {
         title: "Warm-up",
         items: [
-          "5 minutes of bike or incline walk",
-          "Hip openers and ankle mobility",
-          "2 progressive warm-up sets before squats"
+          "5 minutes of light cardio",
+          "Band pull-aparts and scapular mobility",
+          "2 lighter ramp-up sets before your first row or pulldown"
         ]
       },
       {
         title: "Main work",
         items: [
           lift(
-            "Back Squat or Leg Press",
+            "Chest-Supported Row",
             "4 x 6-8",
-            "/exercises/squat.svg",
-            ["Brace before each rep", "Drive knees over toes", "Keep reps consistent"],
-            "Pick the option you can progress steadily with good form. Prioritize depth you can own.",
-            "Hack squat"
+            "/exercises/row.svg",
+            ["Chest fixed to the pad", "Drive elbows back", "Pause the squeeze"],
+            "Treat this as your heavy upper-back movement and keep the reps smooth and repeatable.",
+            "Seated cable row"
           ),
           lift(
-            "Romanian Deadlift",
+            "Pull-Ups or Lat Pulldown",
+            "4 x 8-10",
+            "/exercises/pulldown.svg",
+            ["Stretch fully at the top", "Drive elbows down", "Keep chest up"],
+            "Pick the version that lets you stay in control through the full range instead of chasing sloppy reps.",
+            "Neutral-grip pulldown"
+          ),
+          lift(
+            "Single-Arm Dumbbell Row",
             "3 x 8-10",
-            "/exercises/hinge.svg",
-            ["Push hips back", "Soft knees", "Keep the bar close"],
-            "Chase a strong hamstring stretch and keep your back position fixed throughout.",
-            "Dumbbell RDL"
+            "/exercises/row.svg",
+            ["Reach long at the bottom", "Pull toward your hip", "Do not twist hard"],
+            "Use this to get extra quality lat work without rushing the movement.",
+            "Single-arm cable row"
           ),
           lift(
-            "Walking Lunges or Split Squats",
-            "3 x 10 each leg",
-            "/exercises/lunge.svg",
-            ["Take a stable step", "Stay balanced", "Drive through full foot"],
-            "Use a controlled tempo and keep the torso steady instead of rushing the set.",
-            "Reverse lunges"
-          ),
-          lift(
-            "Leg Curl",
-            "3 x 10-12",
-            "/exercises/hinge.svg",
-            ["Hips pinned down", "Curl fully", "Lower slowly"],
-            "Think about squeezing the hamstrings hard at the back of each rep.",
-            "Seated or lying variation"
-          ),
-          lift(
-            "Standing Calf Raises",
+            "Face Pulls or Rear Delt Fly",
             "3 x 12-15",
-            "/exercises/calves.svg",
-            ["Pause at the top", "Deep stretch at the bottom", "Stay controlled"],
-            "Slow reps work best here. Let the calf actually stretch before driving back up.",
-            "Leg press calf raise"
+            "/exercises/raise.svg",
+            ["Lead with elbows", "Keep shoulders down", "Squeeze upper back"],
+            "Use lighter weight and focus on rear delts and upper-back control rather than momentum.",
+            "Cable rear delt fly"
+          ),
+          lift(
+            "Hammer Curls",
+            "3 x 10-12",
+            "/exercises/arms.svg",
+            ["Neutral grip", "Elbows steady", "Squeeze at the top"],
+            "Keep these strict and let the forearms and biceps do the work.",
+            "Rope hammer curl"
+          ),
+          lift(
+            "Barbell or Dumbbell Curls",
+            "3 x 12-15",
+            "/exercises/arms.svg",
+            ["Keep elbows close", "No swinging", "Full range each rep"],
+            "Finish the session with a clean biceps pump rather than cheating the load up.",
+            "EZ bar curl"
           ),
           lift(
             "Cable Crunches",
             "3 x 10-15",
             "/exercises/core.svg",
             ["Curl ribs toward hips", "Keep hips still", "Control the return"],
-            "Use a full crunch rather than just leaning forward. This should feel like direct ab work, not a rope pulldown.",
+            "Use a full crunch rather than just leaning forward. This gives you one direct ab slot early in the week.",
             "Machine crunch",
             { weight: true, reps: true }
           )
@@ -208,81 +216,74 @@ export const weeklyPlan = [
     day: "Thursday",
     workoutLabel: "Workout Completed",
     mealsLabel: "Meal Plan Followed",
-    workoutSummary: "Upper B (Gym, 1 hour)",
+    workoutSummary: "Lower + Abs (Gym, 1 hour)",
     workoutDescription:
-      "Second upper session with more vertical pressing and pulling plus chest and arm support work.",
+      "One solid lower-body session to keep your legs progressing without taking over the whole week.",
     mealsSummary:
       "Muesli with Milk, Egg & Bacon Sandwich, Grilled Chicken with Sweet Potato Mash",
     detailTitle: "Thursday - Workout Plan",
-    detailWorkout: "Upper B",
-    coachingNote: "Keep the pressing crisp and avoid grinding every set this close to the end of the week.",
+    detailWorkout: "Lower + Abs",
+    coachingNote: "Train legs properly, but keep the session efficient so it supports your upper-body focus rather than draining it.",
     detailSections: [
       {
         title: "Warm-up",
         items: [
-          "5 minutes of light cardio",
-          "Band pull-aparts and shoulder circles",
-          "2 ramp-up sets before overhead press"
+          "5 minutes of bike or incline walk",
+          "Hip openers and ankle mobility",
+          "2 progressive warm-up sets before your first squat pattern"
         ]
       },
       {
         title: "Main work",
         items: [
           lift(
-            "Overhead Press",
+            "Back Squat or Leg Press",
             "4 x 6-8",
-            "/exercises/press.svg",
-            ["Brace abs hard", "Press straight up", "Keep glutes squeezed"],
-            "Keep the bar path tight and avoid turning it into a standing incline press.",
-            "Seated dumbbell shoulder press"
+            "/exercises/squat.svg",
+            ["Brace before each rep", "Drive knees over toes", "Keep reps consistent"],
+            "Pick the option you can progress steadily with good form. Prioritize depth you can own.",
+            "Hack squat"
           ),
           lift(
-            "Pull-Ups or Lat Pulldown",
-            "4 x 8-10",
-            "/exercises/pulldown.svg",
-            ["Start from a dead hang or full stretch", "Drive elbows down", "Stay smooth"],
-            "Pick the variation that lets you stay in the target rep range with solid control.",
-            "Neutral-grip pulldown"
-          ),
-          lift(
-            "Flat Dumbbell Press",
+            "Romanian Deadlift",
             "3 x 8-10",
-            "/exercises/press.svg",
-            ["Shoulder blades set", "Control the stretch", "Press smoothly to full lockout"],
-            "This gives you chest volume without repeating the same incline pattern from Monday.",
-            "Weighted push-ups"
+            "/exercises/hinge.svg",
+            ["Push hips back", "Soft knees", "Keep the load close"],
+            "Chase a strong hamstring stretch and keep the hinge controlled rather than jerky.",
+            "Dumbbell RDL"
           ),
           lift(
-            "Single-Arm Dumbbell Row",
-            "3 x 8-10",
-            "/exercises/row.svg",
-            ["Long reach at bottom", "Drive elbow back", "Do not twist hard"],
-            "Keep the torso stable and use the back to pull instead of jerking with momentum.",
-            "Single-arm cable row"
+            "Walking Lunges or Split Squats",
+            "3 x 10 each leg",
+            "/exercises/lunge.svg",
+            ["Take a stable step", "Stay balanced", "Drive through full foot"],
+            "Use a controlled tempo and keep the torso steady instead of rushing the set.",
+            "Reverse lunges"
           ),
           lift(
-            "Cable or Pec Deck Fly",
-            "2 x 12-15",
-            "/exercises/fly.svg",
-            ["Soft elbows", "Big chest stretch", "Squeeze inward under control"],
-            "Treat this as controlled chest isolation rather than a heavy press.",
-            "Dumbbell fly"
-          ),
-          lift(
-            "Hammer Curls",
+            "Leg Curl",
             "3 x 10-12",
-            "/exercises/arms.svg",
-            ["Neutral grip", "Elbows steady", "Squeeze at the top"],
-            "Keep these strict and let the forearms and brachialis do the work.",
-            "Rope hammer curl"
+            "/exercises/hinge.svg",
+            ["Hips pinned down", "Curl fully", "Lower slowly"],
+            "Think about squeezing the hamstrings hard at the back of each rep.",
+            "Seated or lying variation"
           ),
           lift(
-            "Overhead Tricep Extensions",
-            "3 x 10-12",
-            "/exercises/arms.svg",
-            ["Elbows point up", "Full stretch", "Extend smoothly"],
-            "This pairs well after pressing because it trains the long head in a stretched position.",
-            "Skull crushers"
+            "Standing Calf Raises",
+            "3 x 12-15",
+            "/exercises/calves.svg",
+            ["Pause at the top", "Deep stretch at the bottom", "Stay controlled"],
+            "Slow reps work best here. Let the calf actually stretch before driving back up.",
+            "Leg press calf raise"
+          ),
+          lift(
+            "Hanging Knee Raises",
+            "3 x 12-15",
+            "/exercises/core.svg",
+            ["Brace first", "Move with control", "Do not swing"],
+            "Curl the pelvis up at the top instead of just lifting the knees halfway. Keep momentum low.",
+            "Reverse crunch",
+            { weight: false, reps: true }
           )
         ]
       }
@@ -293,74 +294,89 @@ export const weeklyPlan = [
     day: "Friday",
     workoutLabel: "Workout Completed",
     mealsLabel: "Meal Plan Followed",
-    workoutSummary: "Lower B (Gym, 1 hour)",
+    workoutSummary: "Upper Mixed / Hypertrophy (Gym, 1 hour)",
     workoutDescription:
-      "Second lower day with unilateral work, glutes and hamstrings, calves, and abs.",
+      "A high-value upper-body session for shoulders, chest, arms, and extra back work to round out the week.",
     mealsSummary:
       "Muesli with Milk, Egg & Bacon Sandwich, Grilled Chicken with Sweet Potato Mash",
     detailTitle: "Friday - Workout Plan",
-    detailWorkout: "Lower B",
-    coachingNote: "This day should feel productive, not wrecking. Stay consistent and finish the week well.",
+    detailWorkout: "Upper Mixed / Hypertrophy",
+    coachingNote: "This is your pump-and-progress day. Keep the quality high and leave the gym feeling worked, not trashed.",
     detailSections: [
       {
         title: "Warm-up",
         items: [
           "5 minutes of light cardio",
-          "Hip openers and bodyweight squats",
-          "1-2 ramp-up sets before your first squat pattern"
+          "Shoulder circles and band work",
+          "1-2 ramp-up sets before your first press"
         ]
       },
       {
         title: "Main work",
         items: [
           lift(
-            "Front Squat, Hack Squat, or Goblet Squat",
+            "Overhead Press",
+            "4 x 6-8",
+            "/exercises/press.svg",
+            ["Brace abs hard", "Press straight up", "Keep glutes squeezed"],
+            "Use this as your heavier shoulder movement and keep the reps crisp.",
+            "Seated dumbbell shoulder press"
+          ),
+          lift(
+            "Flat Dumbbell Press",
             "3 x 8-10",
-            "/exercises/squat.svg",
-            ["Stay upright", "Brace before each rep", "Own the bottom position"],
-            "Choose the variation that feels best on your joints and lets you train hard without rushing.",
-            "Leg press"
+            "/exercises/press.svg",
+            ["Shoulder blades set", "Control the stretch", "Press smoothly to full lockout"],
+            "Treat this as quality chest volume rather than an all-out strength test.",
+            "Weighted push-ups"
           ),
           lift(
-            "Bulgarian Split Squats",
-            "3 x 8-10 each leg",
-            "/exercises/lunge.svg",
-            ["Long enough stance", "Stay balanced", "Push through front leg"],
-            "These are tough, so start lighter and keep the reps controlled and even side to side.",
-            "Rear-foot elevated split squat machine if available"
-          ),
-          lift(
-            "Hip Thrust or Glute Bridge",
+            "Lat Pulldown",
             "3 x 8-10",
-            "/exercises/hinge.svg",
-            ["Chin tucked", "Posterior tilt at top", "Pause on lockout"],
-            "Drive through the heels and finish with glutes rather than overextending the lower back.",
-            "Smith machine hip thrust"
+            "/exercises/pulldown.svg",
+            ["Chest tall", "Pull elbows down", "Control the return"],
+            "This keeps another quality back movement in the week without making Friday a full pull day.",
+            "Assisted pull-up"
           ),
           lift(
-            "Seated or Lying Leg Curl",
+            "Incline Dumbbell Press",
+            "3 x 8-10",
+            "/exercises/press.svg",
+            ["Keep wrists stacked", "Control the stretch", "Press up and slightly inward"],
+            "Keep this moderate and smooth to build more upper chest without beating yourself up.",
+            "Machine incline press"
+          ),
+          lift(
+            "Dumbbell Lateral Raises",
+            "3 x 12-15",
+            "/exercises/raise.svg",
+            ["Soft elbows", "Raise to shoulder height", "Keep traps relaxed"],
+            "This is pure shoulder cap work, so chase tension and control over load.",
+            "Cable lateral raise"
+          ),
+          lift(
+            "Cable or Pec Deck Fly",
+            "2 x 12-15",
+            "/exercises/fly.svg",
+            ["Soft elbows", "Big chest stretch", "Squeeze inward under control"],
+            "Use this as a chest finisher with quality reps and a full squeeze.",
+            "Dumbbell fly"
+          ),
+          lift(
+            "Overhead Tricep Extensions",
             "3 x 10-12",
-            "/exercises/hinge.svg",
-            ["Control the lowering", "Squeeze hard", "Stay planted"],
-            "Use this to finish the hamstrings properly after the bigger lifts.",
-            "Single-leg curl"
+            "/exercises/arms.svg",
+            ["Elbows point up", "Full stretch", "Extend smoothly"],
+            "Use this for long-head triceps work after all the pressing.",
+            "Skull crushers"
           ),
           lift(
-            "Seated Calf Raises",
-            "3 x 12-15",
-            "/exercises/calves.svg",
-            ["Full range", "Pause at top", "Do not bounce"],
-            "Take your time and make every rep look the same.",
-            "Standing calf raise"
-          ),
-          lift(
-            "Hanging Knee Raises",
-            "3 x 12-15",
-            "/exercises/core.svg",
-            ["Brace first", "Move with control", "Do not swing"],
-            "Curl the pelvis up at the top instead of just lifting your knees halfway. Keep momentum low.",
-            "Reverse crunch",
-            { weight: false, reps: true }
+            "Hammer Curls",
+            "3 x 10-12",
+            "/exercises/arms.svg",
+            ["Neutral grip", "Elbows steady", "Squeeze at the top"],
+            "Finish with a controlled arm pump and clean technique.",
+            "Rope hammer curl"
           )
         ]
       }

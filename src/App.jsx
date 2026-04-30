@@ -27,10 +27,21 @@ function getWeekKey(date = new Date()) {
   return `${current.getFullYear()}-W${String(week).padStart(2, "0")}`;
 }
 
-function getPreviousWeekKey(date = new Date()) {
-  const previous = new Date(date);
-  previous.setDate(previous.getDate() - 7);
-  return getWeekKey(previous);
+function getMostRecentExerciseLog(workoutLogs, currentWeekKey, day, exerciseName) {
+  const weekKeys = Object.keys(workoutLogs)
+    .filter((key) => key < currentWeekKey)
+    .sort()
+    .reverse();
+
+  for (const key of weekKeys) {
+    const entry = workoutLogs[key]?.[day]?.[exerciseName];
+
+    if (entry?.weight || entry?.reps) {
+      return { ...entry, weekKey: key };
+    }
+  }
+
+  return null;
 }
 
 function getInitialProgress() {
@@ -73,7 +84,6 @@ function App() {
   const [selectedExercise, setSelectedExercise] = useState(null);
   const carouselRef = useRef(null);
   const currentWeekKey = getWeekKey();
-  const previousWeekKey = getPreviousWeekKey();
   const completedDays = Object.values(progress).filter(
     (entry) => entry.workout && entry.meals
   ).length;
@@ -190,7 +200,12 @@ function App() {
 
   const previousExerciseLog =
     selectedDay && selectedExercise
-      ? workoutLogs[previousWeekKey]?.[selectedDay.day]?.[selectedExercise.name] ?? null
+      ? getMostRecentExerciseLog(
+          workoutLogs,
+          currentWeekKey,
+          selectedDay.day,
+          selectedExercise.name
+        )
       : null;
 
   return (
@@ -381,15 +396,16 @@ function App() {
                   </div>
                 </div>
                 <div className="log-card muted">
-                  <p className="exercise-preview-label">Previous week</p>
+                  <p className="exercise-preview-label">Most recent previous entry</p>
                   {previousExerciseLog?.weight || previousExerciseLog?.reps ? (
                     <p className="previous-week">
                       {previousExerciseLog.weight ? `Weight: ${previousExerciseLog.weight}` : ""}
                       {previousExerciseLog.weight && previousExerciseLog.reps ? " | " : ""}
                       {previousExerciseLog.reps ? `Reps: ${previousExerciseLog.reps}` : ""}
+                      {previousExerciseLog.weekKey ? ` | ${previousExerciseLog.weekKey}` : ""}
                     </p>
                   ) : (
-                    <p className="previous-week">No data saved for last week yet.</p>
+                    <p className="previous-week">No previous data saved yet.</p>
                   )}
                 </div>
                 <p className="exercise-alt">
