@@ -170,6 +170,11 @@ input {
   margin-bottom: 18px;
 }
 
+.progress-line {
+  margin: 0;
+  color: #415a77;
+}
+
 .checkbox-row {
   display: flex;
   gap: 10px;
@@ -360,7 +365,8 @@ input {
 .exercise-meta,
 .exercise-preview-label,
 .exercise-sets,
-.exercise-alt {
+.exercise-alt,
+.exercise-status {
   color: #415a77;
 }
 
@@ -368,6 +374,11 @@ input {
 .exercise-preview-label {
   margin-top: 4px;
   font-size: 0.9rem;
+}
+
+.exercise-status {
+  margin-top: 8px;
+  font-size: 0.88rem;
 }
 
 .exercise-image {
@@ -391,6 +402,31 @@ input {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.exercise-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.status-pill {
+  display: inline-flex;
+  width: fit-content;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #edf2f7;
+  color: #415a77;
+  font-size: 0.9rem;
+}
+
+.status-pill.done {
+  background: #d9f99d;
+  color: #365314;
+}
+
+.mark-complete-button {
+  width: 100%;
 }
 
 .log-field {
