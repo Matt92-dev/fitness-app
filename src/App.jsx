@@ -290,14 +290,23 @@ function App() {
                 <div className="detail-section" key={`${selectedDay.day}-${index}`}>
                   {section.title ? <h3>{section.title}</h3> : null}
                   <div className="exercise-list">
-                    {section.items.map((item) =>
-                      typeof item === "string" ? (
-                        <div className="info-row" key={item}>
-                          {item}
-                        </div>
-                      ) : (
+                    {section.items.map((item) => {
+                      if (typeof item === "string") {
+                        return (
+                          <div className="info-row" key={item}>
+                            {item}
+                          </div>
+                        );
+                      }
+
+                      const complete = isExerciseComplete(
+                        item,
+                        currentWeekLogs?.[selectedDay.day]?.[item.name]
+                      );
+
+                      return (
                         <button
-                          className="exercise-button"
+                          className={`exercise-button${complete ? " complete" : ""}`}
                           key={item.name}
                           onClick={() => setSelectedExercise(item)}
                           type="button"
@@ -305,16 +314,31 @@ function App() {
                           <span className="exercise-name">{item.name}</span>
                           <span className="exercise-meta">{item.sets}</span>
                           <span className="exercise-status">
-                            {isExerciseComplete(
-                              item,
-                              currentWeekLogs?.[selectedDay.day]?.[item.name]
-                            )
-                              ? "Complete"
-                              : "Not complete"}
+                            {complete ? (
+                              <>
+                                <svg
+                                  aria-hidden="true"
+                                  className="exercise-status-icon"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    d="M5 12.5l4.2 4.2L19 7"
+                                    stroke="currentColor"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2.8"
+                                  />
+                                </svg>
+                                Complete
+                              </>
+                            ) : (
+                              "Not complete"
+                            )}
                           </span>
                         </button>
-                      )
-                    )}
+                      );
+                    })}
                   </div>
                 </div>
               ))}

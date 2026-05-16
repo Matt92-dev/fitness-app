@@ -336,6 +336,7 @@ input {
   transition:
     transform 120ms ease,
     border-color 120ms ease,
+    background 120ms ease,
     box-shadow 120ms ease;
 }
 
@@ -348,6 +349,23 @@ input {
 .exercise-button.active {
   border-color: #fca311;
   background: linear-gradient(135deg, rgba(252, 163, 17, 0.14), rgba(255, 255, 255, 1));
+}
+
+.exercise-button.complete {
+  border-color: rgba(22, 163, 74, 0.42);
+  background: linear-gradient(135deg, rgba(220, 252, 231, 0.9), #ffffff);
+  box-shadow: inset 4px 0 0 #16a34a;
+}
+
+.exercise-button.complete:hover {
+  border-color: rgba(22, 163, 74, 0.7);
+  box-shadow:
+    inset 4px 0 0 #16a34a,
+    0 10px 24px rgba(22, 163, 74, 0.12);
+}
+
+.exercise-button.complete .exercise-name {
+  color: #14532d;
 }
 
 .exercise-name,
@@ -377,8 +395,27 @@ input {
 }
 
 .exercise-status {
-  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin-top: 10px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #edf2f7;
   font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.exercise-button.complete .exercise-status {
+  background: #bbf7d0;
+  color: #14532d;
+}
+
+.exercise-status-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
 }
 
 .exercise-image {

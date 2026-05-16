@@ -21,21 +21,21 @@ export const weeklyPlan = [
     day: "Monday",
     workoutLabel: "Workout Completed",
     mealsLabel: "Meal Plan Followed",
-    workoutSummary: "Upper Push (Gym, 1 hour)",
+    workoutSummary: "Push - Chest/Shoulders (Gym, 1 hour)",
     workoutDescription:
       "Chest, shoulders, and triceps focus to start the week with your heaviest pushing work.",
     mealsSummary:
       "Muesli with Milk, Egg & Bacon Sandwich, Grilled Chicken with Sweet Potato Mash",
     detailTitle: "Monday - Workout Plan",
-    detailWorkout: "Upper Push",
-    coachingNote: "Start the week by pushing hard on the big compounds, then chase clean upper-body volume.",
+    detailWorkout: "Push - Chest/Shoulders",
+    coachingNote: "Start the week by pushing hard on chest and shoulders, then finish with clean delt and triceps volume.",
     detailSections: [
       {
         title: "Warm-up",
         items: [
           "5 minutes of light cardio",
           "Band pull-aparts or shoulder mobility",
-          "2 lighter ramp-up sets before your first press and first row"
+          "2 lighter ramp-up sets before your first press"
         ]
       },
       {
@@ -50,14 +50,6 @@ export const weeklyPlan = [
             "Machine chest press or dumbbell bench press"
           ),
           lift(
-            "Chest-Supported Row",
-            "4 x 8-10",
-            "/exercises/row.svg",
-            ["Keep chest glued to pad", "Pull elbows toward hips", "Pause briefly at the top"],
-            "Focus on upper-back tension instead of yanking the weight. Let the shoulder blades move naturally.",
-            "Seated cable row"
-          ),
-          lift(
             "Incline Dumbbell Press",
             "3 x 8-10",
             "/exercises/press.svg",
@@ -66,23 +58,31 @@ export const weeklyPlan = [
             "Incline machine press"
           ),
           lift(
-            "Lat Pulldown",
-            "3 x 8-10",
-            "/exercises/pulldown.svg",
-            ["Chest tall", "Pull elbows down", "Avoid leaning way back"],
-            "Pull to the upper chest and control the return so your lats stay working the whole time.",
-            "Assisted pull-up"
+            "Overhead Press",
+            "3 x 6-8",
+            "/exercises/press.svg",
+            ["Brace abs hard", "Press straight up", "Keep glutes squeezed"],
+            "Keep the bar path tight and avoid turning it into a standing incline press.",
+            "Seated dumbbell shoulder press"
           ),
           lift(
             "Dumbbell Lateral Raises",
-            "3 x 12-15",
+            "4 x 12-15",
             "/exercises/raise.svg",
             ["Soft elbows", "Raise to shoulder height", "Keep traps relaxed"],
             "Use lighter weight than you think and keep tension on the side delts throughout.",
             "Cable lateral raise"
           ),
           lift(
-            "Cable Tricep Pushdowns",
+            "Cable or Pec Deck Fly",
+            "2 x 12-15",
+            "/exercises/fly.svg",
+            ["Soft elbows", "Big chest stretch", "Squeeze inward under control"],
+            "Treat this as controlled chest isolation rather than a heavy press.",
+            "Dumbbell fly"
+          ),
+          lift(
+            "Tricep Pushdowns",
             "3 x 10-12",
             "/exercises/arms.svg",
             ["Upper arms still", "Lock out hard", "Control the return"],
@@ -90,12 +90,12 @@ export const weeklyPlan = [
             "Overhead rope extensions"
           ),
           lift(
-            "Barbell or Dumbbell Curls",
-            "3 x 10-12",
+            "Optional Curls",
+            "2 x 12",
             "/exercises/arms.svg",
             ["Keep elbows close", "No swinging", "Squeeze at the top"],
-            "Use a full range and keep the movement strict so the biceps do the work.",
-            "EZ bar curl"
+            "Keep this optional and strict if you want a little extra arm work without turning Monday into a pull day.",
+            "Dumbbell curls"
           )
         ]
       }
@@ -106,13 +106,13 @@ export const weeklyPlan = [
     day: "Tuesday",
     workoutLabel: "Workout Completed",
     mealsLabel: "Meal Plan Followed",
-    workoutSummary: "Upper Pull (Gym, 1 hour)",
+    workoutSummary: "Pull - Back/Arms (Gym, 1 hour)",
     workoutDescription:
       "Back, rear delts, and biceps focus with plenty of pulling volume for upper-body growth.",
     mealsSummary:
       "Muesli with Milk, Egg & Bacon Sandwich, Grilled Chicken with Sweet Potato Mash",
     detailTitle: "Tuesday - Workout Plan",
-    detailWorkout: "Upper Pull",
+    detailWorkout: "Pull - Back/Arms",
     coachingNote: "Focus on controlled pulling and let your back do the work rather than rushing the reps.",
     detailSections: [
       {
@@ -128,7 +128,7 @@ export const weeklyPlan = [
         items: [
           lift(
             "Chest-Supported Row",
-            "4 x 6-8",
+            "3 x 8-10",
             "/exercises/row.svg",
             ["Chest fixed to the pad", "Drive elbows back", "Pause the squeeze"],
             "Treat this as your heavy upper-back movement and keep the reps smooth and repeatable.",
@@ -136,15 +136,15 @@ export const weeklyPlan = [
           ),
           lift(
             "Pull-Ups or Lat Pulldown",
-            "4 x 8-10",
+            "3 x 8-10",
             "/exercises/pulldown.svg",
             ["Stretch fully at the top", "Drive elbows down", "Keep chest up"],
             "Pick the version that lets you stay in control through the full range instead of chasing sloppy reps.",
             "Neutral-grip pulldown"
           ),
           lift(
-            "Single-Arm Dumbbell Row",
-            "3 x 8-10",
+            "Single-Arm Row",
+            "2 x 10",
             "/exercises/row.svg",
             ["Reach long at the bottom", "Pull toward your hip", "Do not twist hard"],
             "Use this to get extra quality lat work without rushing the movement.",
@@ -168,7 +168,7 @@ export const weeklyPlan = [
           ),
           lift(
             "Barbell or Dumbbell Curls",
-            "3 x 12-15",
+            "2-3 x 10-12",
             "/exercises/arms.svg",
             ["Keep elbows close", "No swinging", "Full range each rep"],
             "Finish the session with a clean biceps pump rather than cheating the load up.",
@@ -216,13 +216,13 @@ export const weeklyPlan = [
     day: "Thursday",
     workoutLabel: "Workout Completed",
     mealsLabel: "Meal Plan Followed",
-    workoutSummary: "Lower + Abs (Gym, 1 hour)",
+    workoutSummary: "Legs + Core (Gym, 1 hour)",
     workoutDescription:
       "One solid lower-body session to keep your legs progressing without taking over the whole week.",
     mealsSummary:
       "Muesli with Milk, Egg & Bacon Sandwich, Grilled Chicken with Sweet Potato Mash",
     detailTitle: "Thursday - Workout Plan",
-    detailWorkout: "Lower + Abs",
+    detailWorkout: "Legs + Core",
     coachingNote: "Train legs properly, but keep the session efficient so it supports your upper-body focus rather than draining it.",
     detailSections: [
       {
@@ -237,7 +237,7 @@ export const weeklyPlan = [
         title: "Main work",
         items: [
           lift(
-            "Back Squat or Leg Press",
+            "Squat or Leg Press",
             "4 x 6-8",
             "/exercises/squat.svg",
             ["Brace before each rep", "Drive knees over toes", "Keep reps consistent"],
@@ -253,8 +253,8 @@ export const weeklyPlan = [
             "Dumbbell RDL"
           ),
           lift(
-            "Walking Lunges or Split Squats",
-            "3 x 10 each leg",
+            "Lunges or Split Squats",
+            "2 x 10",
             "/exercises/lunge.svg",
             ["Take a stable step", "Stay balanced", "Drive through full foot"],
             "Use a controlled tempo and keep the torso steady instead of rushing the set.",
@@ -262,14 +262,14 @@ export const weeklyPlan = [
           ),
           lift(
             "Leg Curl",
-            "3 x 10-12",
+            "2-3 x 10-12",
             "/exercises/hinge.svg",
             ["Hips pinned down", "Curl fully", "Lower slowly"],
             "Think about squeezing the hamstrings hard at the back of each rep.",
             "Seated or lying variation"
           ),
           lift(
-            "Standing Calf Raises",
+            "Calf Raises",
             "3 x 12-15",
             "/exercises/calves.svg",
             ["Pause at the top", "Deep stretch at the bottom", "Stay controlled"],
@@ -294,34 +294,26 @@ export const weeklyPlan = [
     day: "Friday",
     workoutLabel: "Workout Completed",
     mealsLabel: "Meal Plan Followed",
-    workoutSummary: "Upper Mixed / Hypertrophy (Gym, 1 hour)",
+    workoutSummary: "Upper Hypertrophy / Aesthetics (Gym, 1 hour)",
     workoutDescription:
       "A high-value upper-body session for shoulders, chest, arms, and extra back work to round out the week.",
     mealsSummary:
       "Muesli with Milk, Egg & Bacon Sandwich, Grilled Chicken with Sweet Potato Mash",
     detailTitle: "Friday - Workout Plan",
-    detailWorkout: "Upper Mixed / Hypertrophy",
-    coachingNote: "This is your pump-and-progress day. Keep the quality high and leave the gym feeling worked, not trashed.",
+    detailWorkout: "Upper Hypertrophy / Aesthetics",
+    coachingNote: "This is where you bias your physique. Keep the quality high and make the chest, shoulders, and arms work.",
     detailSections: [
       {
         title: "Warm-up",
         items: [
           "5 minutes of light cardio",
           "Shoulder circles and band work",
-          "1-2 ramp-up sets before your first press"
+          "1-2 ramp-up sets before your first dumbbell press"
         ]
       },
       {
         title: "Main work",
         items: [
-          lift(
-            "Overhead Press",
-            "4 x 6-8",
-            "/exercises/press.svg",
-            ["Brace abs hard", "Press straight up", "Keep glutes squeezed"],
-            "Use this as your heavier shoulder movement and keep the reps crisp.",
-            "Seated dumbbell shoulder press"
-          ),
           lift(
             "Flat Dumbbell Press",
             "3 x 8-10",
@@ -331,31 +323,31 @@ export const weeklyPlan = [
             "Weighted push-ups"
           ),
           lift(
-            "Lat Pulldown",
-            "3 x 8-10",
-            "/exercises/pulldown.svg",
-            ["Chest tall", "Pull elbows down", "Control the return"],
-            "This keeps another quality back movement in the week without making Friday a full pull day.",
-            "Assisted pull-up"
-          ),
-          lift(
             "Incline Dumbbell Press",
-            "3 x 8-10",
+            "3 x 10-12",
             "/exercises/press.svg",
             ["Keep wrists stacked", "Control the stretch", "Press up and slightly inward"],
             "Keep this moderate and smooth to build more upper chest without beating yourself up.",
             "Machine incline press"
           ),
           lift(
+            "Dumbbell Shoulder Press",
+            "3 x 8-10",
+            "/exercises/press.svg",
+            ["Brace abs hard", "Press smoothly", "Keep shoulders controlled"],
+            "Use a steady tempo and stop the set before reps turn into a grind.",
+            "Machine shoulder press"
+          ),
+          lift(
             "Dumbbell Lateral Raises",
-            "3 x 12-15",
+            "4 x 12-15",
             "/exercises/raise.svg",
             ["Soft elbows", "Raise to shoulder height", "Keep traps relaxed"],
             "This is pure shoulder cap work, so chase tension and control over load.",
             "Cable lateral raise"
           ),
           lift(
-            "Cable or Pec Deck Fly",
+            "Cable Fly",
             "2 x 12-15",
             "/exercises/fly.svg",
             ["Soft elbows", "Big chest stretch", "Squeeze inward under control"],
