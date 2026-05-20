@@ -288,6 +288,76 @@ export const weeklyPlan = [
         ]
       }
     ],
+    homeAlternative: {
+      detailWorkout: "Home Legs + Core",
+      coachingNote:
+        "Use your two 14kg adjustable dumbbells, slow the lowering phase, and make the single-leg work do the heavy lifting.",
+      detailSections: [
+        {
+          title: "Warm-up",
+          items: [
+            "3-5 minutes of easy movement, marching, or stair walking",
+            "10 bodyweight squats",
+            "10 hip hinges",
+            "8 reverse lunges each side"
+          ]
+        },
+        {
+          title: "Main work",
+          items: [
+            lift(
+              "Goblet Squat",
+              "4 x 10-15",
+              "/exercises/squat.svg",
+              ["Hold one dumbbell at chest", "Keep heels planted", "Pause at the bottom"],
+              "Hold one dumbbell upright against your chest. Brace your stomach, sit down between your legs, then push through your feet to stand. Use a slow 3-second lower if the weight feels light.",
+              "Double dumbbell front squat"
+            ),
+            lift(
+              "Dumbbell Romanian Deadlift",
+              "4 x 10-15",
+              "/exercises/hinge.svg",
+              ["Push hips back", "Keep back flat", "Feel hamstrings stretch"],
+              "Hold both dumbbells in front of your thighs. Keep a slight knee bend, push your hips back, let the dumbbells travel down your legs, then squeeze your glutes to stand tall.",
+              "Single-leg Romanian deadlift"
+            ),
+            lift(
+              "Bulgarian Split Squat",
+              "3 x 8-12 each leg",
+              "/exercises/lunge.svg",
+              ["Back foot elevated", "Front foot does the work", "Stay controlled"],
+              "Place your back foot on a sofa, chair, or bed. Lower your back knee toward the floor, keep most of your weight through the front foot, then drive back up. Start bodyweight if balance is tricky.",
+              "Static split squat"
+            ),
+            lift(
+              "Reverse Lunges",
+              "2-3 x 10-12 each leg",
+              "/exercises/lunge.svg",
+              ["Step back", "Front heel stays down", "Push through front foot"],
+              "Stand tall with dumbbells by your sides. Step one leg back, lower until both knees bend, then push through the front foot to return to standing.",
+              "Bodyweight reverse lunges"
+            ),
+            lift(
+              "Single-Leg Calf Raises",
+              "4 x 12-20 each leg",
+              "/exercises/calves.svg",
+              ["Use support for balance", "Pause at the top", "Lower slowly"],
+              "Stand on one leg and hold one dumbbell. Rise onto the ball of your foot, pause for a second, then lower under control. Use a wall or chair for balance.",
+              "Double-leg calf raises"
+            ),
+            lift(
+              "Reverse Crunches",
+              "3 x 12-20",
+              "/exercises/core.svg",
+              ["Lower back stays down", "Curl hips up", "No swinging"],
+              "Lie on your back with knees bent. Curl your knees toward your chest and lift your hips slightly off the floor, then lower slowly without swinging your legs.",
+              "Dead bugs",
+              { weight: false, reps: true }
+            )
+          ]
+        }
+      ]
+    },
     meals: mealPlan
   },
   {

@@ -57,10 +57,14 @@ function getInitialWorkoutLogs() {
   }
 }
 
-function getExerciseItems(dayPlan) {
-  return dayPlan.detailSections
+function getExerciseItemsFromSections(sections) {
+  return sections
     .flatMap((section) => section.items)
     .filter((item) => typeof item === "object");
+}
+
+function getExerciseItems(dayPlan) {
+  return getExerciseItemsFromSections(dayPlan.detailSections);
 }
 
 function areRequiredFieldsFilled(exercise, log = {}) {
@@ -74,10 +78,9 @@ function isExerciseComplete(exercise, log = {}) {
   return Boolean(log.completed) || areRequiredFieldsFilled(exercise, log);
 }
 
-function getDayProgress(dayPlan, weeklyLogs) {
-  const exercises = getExerciseItems(dayPlan);
+function getExerciseProgress(day, exercises, weeklyLogs) {
   const completed = exercises.filter((exercise) =>
-    isExerciseComplete(exercise, weeklyLogs?.[dayPlan.day]?.[exercise.name])
+    isExerciseComplete(exercise, weeklyLogs?.[day]?.[exercise.name])
   ).length;
 
   return {
@@ -87,10 +90,28 @@ function getDayProgress(dayPlan, weeklyLogs) {
   };
 }
 
+function getDayProgress(dayPlan, weeklyLogs) {
+  const gymProgress = getExerciseProgress(dayPlan.day, getExerciseItems(dayPlan), weeklyLogs);
+  const homeExercises = dayPlan.homeAlternative
+    ? getExerciseItemsFromSections(dayPlan.homeAlternative.detailSections)
+    : [];
+  const homeProgress = getExerciseProgress(dayPlan.day, homeExercises, weeklyLogs);
+
+  if (homeProgress.isComplete || homeProgress.completed > gymProgress.completed) {
+    return homeProgress;
+  }
+
+  return {
+    ...gymProgress,
+    isComplete: gymProgress.isComplete || homeProgress.isComplete
+  };
+}
+
 function App() {
   const [workoutLogs, setWorkoutLogs] = useState(getInitialWorkoutLogs);
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedExercise, setSelectedExercise] = useState(null);
+  const [selectedWorkoutMode, setSelectedWorkoutMode] = useState("gym");
   const carouselRef = useRef(null);
   const currentWeekKey = getWeekKey();
   const currentWeekLogs = workoutLogs[currentWeekKey] ?? {};
@@ -157,6 +178,7 @@ function App() {
   useEffect(() => {
     if (!selectedDay) {
       setSelectedExercise(null);
+      setSelectedWorkoutMode("gym");
     }
   }, [selectedDay]);
 
@@ -183,11 +205,13 @@ function App() {
   const openWorkoutDay = (dayPlan) => {
     setSelectedDay(dayPlan);
     setSelectedExercise(null);
+    setSelectedWorkoutMode("gym");
   };
 
   const closeWorkoutFlow = () => {
     setSelectedDay(null);
     setSelectedExercise(null);
+    setSelectedWorkoutMode("gym");
   };
 
   const selectedExerciseLog =
@@ -207,6 +231,11 @@ function App() {
           selectedExercise.name
         )
       : null;
+
+  const activeWorkout =
+    selectedDay?.homeAlternative && selectedWorkoutMode === "home"
+      ? selectedDay.homeAlternative
+      : selectedDay;
 
   return (
     <div className="app-shell">
@@ -283,11 +312,39 @@ function App() {
             </header>
 
             <div className="screen-content">
-              <p className="detail-lead">{selectedDay.detailWorkout}</p>
-              <p className="coaching-note">{selectedDay.coachingNote}</p>
+              <div className="workout-title-row">
+                <div>
+                  <p className="detail-lead">{activeWorkout.detailWorkout}</p>
+                  <p className="coaching-note">{activeWorkout.coachingNote}</p>
+                </div>
+                {selectedDay.homeAlternative ? (
+                  <div className="mode-toggle" aria-label="Workout option">
+                    <button
+                      className={selectedWorkoutMode === "gym" ? "active" : ""}
+                      onClick={() => {
+                        setSelectedWorkoutMode("gym");
+                        setSelectedExercise(null);
+                      }}
+                      type="button"
+                    >
+                      Gym
+                    </button>
+                    <button
+                      className={selectedWorkoutMode === "home" ? "active" : ""}
+                      onClick={() => {
+                        setSelectedWorkoutMode("home");
+                        setSelectedExercise(null);
+                      }}
+                      type="button"
+                    >
+                      Home
+                    </button>
+                  </div>
+                ) : null}
+              </div>
 
-              {selectedDay.detailSections.map((section, index) => (
-                <div className="detail-section" key={`${selectedDay.day}-${index}`}>
+              {activeWorkout.detailSections.map((section, index) => (
+                <div className="detail-section" key={`${selectedDay.day}-${selectedWorkoutMode}-${index}`}>
                   {section.title ? <h3>{section.title}</h3> : null}
                   <div className="exercise-list">
                     {section.items.map((item) => {

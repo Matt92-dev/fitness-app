@@ -299,6 +299,38 @@ input {
   color: #415a77;
 }
 
+.workout-title-row {
+  display: grid;
+  gap: 12px;
+}
+
+.mode-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  width: min(100%, 260px);
+  padding: 4px;
+  border: 1px solid rgba(20, 33, 61, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.mode-toggle button {
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: transparent;
+  color: #415a77;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.mode-toggle button.active {
+  background: #14213d;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(20, 33, 61, 0.12);
+}
+
 .detail-section,
 .log-card,
 .exercise-screen {
