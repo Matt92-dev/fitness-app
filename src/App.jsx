@@ -26,6 +26,104 @@ function getWeekKey(date = new Date()) {
   return `${current.getFullYear()}-W${String(week).padStart(2, "0")}`;
 }
 
+function getDateForWeekDay(weekKey, dayName) {
+  const match = weekKey?.match(/^(\d{4})-W(\d{2})$/);
+  const dayIndex = DAY_NAMES.indexOf(dayName);
+
+  if (!match || dayIndex === -1) {
+    return null;
+  }
+
+  const year = Number(match[1]);
+  const week = Number(match[2]);
+  const januaryFourth = new Date(year, 0, 4);
+  const januaryFourthDay = (januaryFourth.getDay() + 6) % 7;
+  const weekOneMonday = new Date(januaryFourth);
+  weekOneMonday.setDate(januaryFourth.getDate() - januaryFourthDay);
+  weekOneMonday.setHours(0, 0, 0, 0);
+
+  const targetDate = new Date(weekOneMonday);
+  const mondayBasedDayIndex = (dayIndex + 6) % 7;
+  targetDate.setDate(weekOneMonday.getDate() + (week - 1) * 7 + mondayBasedDayIndex);
+
+  return targetDate;
+}
+
+function getRelativeLogLabel(entry, dayName, now = new Date()) {
+  const loggedDate = entry?.updatedAt
+    ? new Date(entry.updatedAt)
+    : getDateForWeekDay(entry?.weekKey, dayName);
+
+  if (!loggedDate || Number.isNaN(loggedDate.getTime())) {
+    return entry?.weekKey ?? "";
+  }
+
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+  loggedDate.setHours(0, 0, 0, 0);
+
+  const daysAgo = Math.max(0, Math.floor((today - loggedDate) / 86400000));
+
+  if (daysAgo === 0) {
+    return "Today";
+  }
+
+  if (daysAgo === 1) {
+    return "Yesterday";
+  }
+
+  if (daysAgo < 7) {
+    return `${daysAgo} days ago`;
+  }
+
+  if (daysAgo < 14) {
+    return "Last week";
+  }
+
+  if (daysAgo < 28) {
+    return `${Math.floor(daysAgo / 7)} weeks ago`;
+  }
+
+  if (daysAgo < 45) {
+    return "Last month";
+  }
+
+  return "More than a month ago";
+}
+
+function getWeightValue(weight = "") {
+  const match = String(weight).replace(",", ".").match(/\d+(\.\d+)?/);
+
+  return match ? Number(match[0]) : null;
+}
+
+function getBestExerciseLog(workoutLogs, exerciseName) {
+  let bestLog = null;
+  let bestWeight = -Infinity;
+
+  Object.values(workoutLogs).forEach((weekLog) => {
+    Object.values(weekLog ?? {}).forEach((dayLog) => {
+      const entry = dayLog?.[exerciseName];
+      const weightValue = getWeightValue(entry?.weight);
+
+      if (weightValue !== null && weightValue > bestWeight) {
+        bestWeight = weightValue;
+        bestLog = entry;
+      }
+    });
+  });
+
+  return bestLog;
+}
+
+function formatBestExerciseLog(entry) {
+  if (!entry?.weight) {
+    return "";
+  }
+
+  return entry.reps ? `Best: ${entry.weight} | ${entry.reps}` : `Best: ${entry.weight}`;
+}
+
 function getMostRecentExerciseLog(workoutLogs, currentWeekKey, day, exerciseName) {
   const weekKeys = Object.keys(workoutLogs)
     .filter((key) => key < currentWeekKey)
@@ -191,7 +289,8 @@ function App() {
           ...current[currentWeekKey]?.[day],
           [exerciseName]: {
             ...current[currentWeekKey]?.[day]?.[exerciseName],
-            [field]: value
+            [field]: value,
+            updatedAt: new Date().toISOString()
           }
         }
       }
@@ -231,6 +330,10 @@ function App() {
           selectedExercise.name
         )
       : null;
+  const previousExerciseLabel =
+    selectedDay && previousExerciseLog
+      ? getRelativeLogLabel(previousExerciseLog, selectedDay.day)
+      : "";
 
   const activeWorkout =
     selectedDay?.homeAlternative && selectedWorkoutMode === "home"
@@ -360,6 +463,9 @@ function App() {
                         item,
                         currentWeekLogs?.[selectedDay.day]?.[item.name]
                       );
+                      const bestExerciseLabel = formatBestExerciseLog(
+                        getBestExerciseLog(workoutLogs, item.name)
+                      );
 
                       return (
                         <button
@@ -370,6 +476,9 @@ function App() {
                         >
                           <span className="exercise-name">{item.name}</span>
                           <span className="exercise-meta">{item.sets}</span>
+                          {bestExerciseLabel ? (
+                            <span className="exercise-best">{bestExerciseLabel}</span>
+                          ) : null}
                           <span className="exercise-status">
                             {complete ? (
                               <>
@@ -451,7 +560,9 @@ function App() {
                         <span>Reps</span>
                         <input
                           type="text"
-                          inputMode="numeric"
+                          inputMode="text"
+                          autoCapitalize="off"
+                          autoCorrect="off"
                           placeholder="e.g. 8, 8, 7"
                           value={selectedExerciseLog.reps ?? ""}
                           onChange={(event) =>
@@ -490,7 +601,7 @@ function App() {
                       {previousExerciseLog.weight ? `Weight: ${previousExerciseLog.weight}` : ""}
                       {previousExerciseLog.weight && previousExerciseLog.reps ? " | " : ""}
                       {previousExerciseLog.reps ? `Reps: ${previousExerciseLog.reps}` : ""}
-                      {previousExerciseLog.weekKey ? ` | ${previousExerciseLog.weekKey}` : ""}
+                      {previousExerciseLabel ? ` | ${previousExerciseLabel}` : ""}
                     </p>
                   ) : (
                     <p className="previous-week">No previous data saved yet.</p>

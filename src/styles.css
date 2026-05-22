@@ -112,6 +112,8 @@ input {
 }
 
 .tile {
+  display: flex;
+  flex-direction: column;
   border-radius: 28px;
   padding: 20px;
   min-height: 100%;
@@ -205,6 +207,7 @@ input {
 
 .primary-button {
   width: 100%;
+  margin-top: auto;
   color: #ffffff;
   background: linear-gradient(135deg, #14213d 0%, #1d3557 100%);
 }
@@ -402,6 +405,7 @@ input {
 
 .exercise-name,
 .exercise-meta,
+.exercise-best,
 .exercise-preview-label,
 .exercise-sets {
   display: block;
@@ -416,14 +420,21 @@ input {
 .exercise-preview-label,
 .exercise-sets,
 .exercise-alt,
+.exercise-best,
 .exercise-status {
   color: #415a77;
 }
 
 .exercise-meta,
-.exercise-preview-label {
+.exercise-preview-label,
+.exercise-best {
   margin-top: 4px;
   font-size: 0.9rem;
+}
+
+.exercise-best {
+  color: #1d3557;
+  font-weight: 700;
 }
 
 .exercise-status {
@@ -542,7 +553,7 @@ input {
 
 @media (max-width: 720px) {
   .app-shell {
-    width: min(100% - 20px, 1200px);
+    width: min(100% - 35px, 1200px);
     padding-top: 20px;
   }
 
