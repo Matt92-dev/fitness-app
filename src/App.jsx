@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { weeklyPlan } from "./data";
 
 const WORKOUT_LOGS_KEY = "fitness-tracker-workout-logs-v1";
@@ -10,6 +10,14 @@ const DAY_NAMES = [
   "Thursday",
   "Friday",
   "Saturday"
+];
+const SHORT_DAY_NAMES = ["M", "T", "W", "T", "F", "S", "S"];
+
+const NAV_ITEMS = [
+  { label: "Dashboard", icon: "home" },
+  { label: "Progress", icon: "progress" },
+  { label: "History", icon: "calendar" },
+  { label: "Profile", icon: "profile" }
 ];
 
 function getWeekKey(date = new Date()) {
@@ -24,6 +32,27 @@ function getWeekKey(date = new Date()) {
   const week = 1 + Math.round(diff / 604800000);
 
   return `${current.getFullYear()}-W${String(week).padStart(2, "0")}`;
+}
+
+function getCurrentWeekRange(date = new Date()) {
+  const monday = new Date(date);
+  const mondayOffset = (monday.getDay() + 6) % 7;
+  monday.setDate(monday.getDate() - mondayOffset);
+  monday.setHours(0, 0, 0, 0);
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  const month = new Intl.DateTimeFormat("en-GB", { month: "short" });
+  const sameMonth = monday.getMonth() === sunday.getMonth();
+  const start = sameMonth
+    ? `${month.format(monday)} ${monday.getDate()}`
+    : `${month.format(monday)} ${monday.getDate()}`;
+  const end = sameMonth
+    ? `${sunday.getDate()}`
+    : `${month.format(sunday)} ${sunday.getDate()}`;
+
+  return sameMonth ? `${start} - ${end}` : `${start} - ${end}`;
 }
 
 function getDateForWeekDay(weekKey, dayName) {
@@ -124,6 +153,160 @@ function formatBestExerciseLog(entry) {
   return entry.reps ? `Best: ${entry.weight} | ${entry.reps}` : `Best: ${entry.weight}`;
 }
 
+function getWorkoutLabel(summary) {
+  return summary.replace(/\s*\([^)]*\)/, "").replace(" - ", "  •  ");
+}
+
+function getWorkoutMeta(summary) {
+  const match = summary.match(/\(([^)]*)\)/);
+
+  return match ? match[1].replace(",", "  •") : "Open";
+}
+
+function getWorkoutIcon(dayPlan) {
+  const summary = dayPlan.workoutSummary.toLowerCase();
+
+  if (summary.includes("push")) {
+    return "push";
+  }
+
+  if (summary.includes("pull")) {
+    return "pull";
+  }
+
+  if (summary.includes("leg")) {
+    return "legs";
+  }
+
+  if (summary.includes("recovery") || summary.includes("rest")) {
+    return "recovery";
+  }
+
+  return "workout";
+}
+
+function AppIcon({ name }) {
+  if (name === "home") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1v-9.5Z" />
+      </svg>
+    );
+  }
+
+  if (name === "progress") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M5 19V11" />
+        <path d="M12 19V5" />
+        <path d="M19 19v-8" />
+        <path d="M4 19h16" />
+      </svg>
+    );
+  }
+
+  if (name === "calendar") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M7 3v4" />
+        <path d="M17 3v4" />
+        <path d="M4 9h16" />
+        <path d="M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" />
+      </svg>
+    );
+  }
+
+  if (name === "profile") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+        <path d="M4.5 20a8 8 0 0 1 15 0" />
+      </svg>
+    );
+  }
+
+  if (name === "bell") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z" />
+        <path d="M10 21h4" />
+      </svg>
+    );
+  }
+
+  if (name === "calendar-small") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M7 3v4" />
+        <path d="M17 3v4" />
+        <path d="M4 9h16" />
+        <path d="M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" />
+      </svg>
+    );
+  }
+
+  if (name === "arrow") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="m9 5 7 7-7 7" />
+      </svg>
+    );
+  }
+
+  return null;
+}
+
+function WorkoutIcon({ type }) {
+  if (type === "push") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M8 7h8l2 4-2 7H8l-2-7 2-4Z" />
+        <path d="M8 7 6 4" />
+        <path d="m16 7 2-3" />
+        <path d="M9 11h6" />
+      </svg>
+    );
+  }
+
+  if (type === "pull") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M6 15c2.5-5.5 6-8.5 11-8" />
+        <path d="M7 14c2 0 3.5 1.2 4 3" />
+        <path d="M12 8c1.5 1.4 3.4 2 6 1.6" />
+        <path d="M5 18h12" />
+      </svg>
+    );
+  }
+
+  if (type === "legs") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M8 4v6l-3 9" />
+        <path d="M14 4v5l4 10" />
+        <path d="M7 19h4" />
+        <path d="M16 19h4" />
+        <path d="M8 10h6" />
+      </svg>
+    );
+  }
+
+  if (type === "recovery") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M19 15.5A7.5 7.5 0 0 1 8.5 5 8 8 0 1 0 19 15.5Z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <path d="M12 5v14" />
+      <path d="M5 12h14" />
+    </svg>
+  );
+}
+
 function getMostRecentExerciseLog(workoutLogs, currentWeekKey, day, exerciseName) {
   const weekKeys = Object.keys(workoutLogs)
     .filter((key) => key < currentWeekKey)
@@ -210,68 +393,18 @@ function App() {
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [selectedWorkoutMode, setSelectedWorkoutMode] = useState("gym");
-  const carouselRef = useRef(null);
   const currentWeekKey = getWeekKey();
   const currentWeekLogs = workoutLogs[currentWeekKey] ?? {};
   const mainTrainingDays = weeklyPlan.filter((dayPlan) => getExerciseItems(dayPlan).length > 0);
   const completedDays = mainTrainingDays.filter((dayPlan) =>
     getDayProgress(dayPlan, currentWeekLogs).isComplete
   ).length;
+  const mainProgressPercent = Math.round((completedDays / mainTrainingDays.length) * 100);
+  const currentWeekRange = getCurrentWeekRange();
 
   useEffect(() => {
     window.localStorage.setItem(WORKOUT_LOGS_KEY, JSON.stringify(workoutLogs));
   }, [workoutLogs]);
-
-  useEffect(() => {
-    const carousel = carouselRef.current;
-
-    if (!carousel) {
-      return undefined;
-    }
-
-    const handleWheel = (event) => {
-      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) {
-        return;
-      }
-
-      event.preventDefault();
-      carousel.scrollBy({
-        left: event.deltaY,
-        behavior: "smooth"
-      });
-    };
-
-    carousel.addEventListener("wheel", handleWheel, { passive: false });
-
-    return () => {
-      carousel.removeEventListener("wheel", handleWheel);
-    };
-  }, []);
-
-  useEffect(() => {
-    const carousel = carouselRef.current;
-
-    if (!carousel) {
-      return undefined;
-    }
-
-    const today = DAY_NAMES[new Date().getDay()];
-    const activeCard = carousel.querySelector(`[data-day="${today}"]`);
-
-    if (!activeCard) {
-      return undefined;
-    }
-
-    const frame = window.requestAnimationFrame(() => {
-      activeCard.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center"
-      });
-    });
-
-    return () => window.cancelAnimationFrame(frame);
-  }, []);
 
   useEffect(() => {
     if (!selectedDay) {
@@ -342,8 +475,8 @@ function App() {
 
   return (
     <div className="app-shell">
-      <header className="hero">
-        <div>
+      <header className="dashboard-hero">
+        <div className="hero-copy-block">
           <p className="eyebrow">Personal fitness dashboard</p>
           <h1>Weekly Workout Tracker</h1>
           <p className="hero-copy">
@@ -351,55 +484,139 @@ function App() {
             week automatically.
           </p>
         </div>
-        <div className="hero-stats">
-          <div className="stat-card">
-            <span className="stat-value">{completedDays}/4</span>
-            <span className="stat-label">main training days completed</span>
-          </div>
-        </div>
+        <button className="icon-button notification-button" type="button" aria-label="Notifications">
+          <AppIcon name="bell" />
+          <span aria-hidden="true" />
+        </button>
       </header>
 
-      <main>
-        <section className="carousel" aria-label="Weekly plan" ref={carouselRef}>
+      <main className="dashboard-main">
+        <section className="overview-card" aria-label="Main training days progress">
+          <div className="progress-ring" style={{ "--progress": `${mainProgressPercent}%` }}>
+            <div>
+              <strong>{completedDays}/{mainTrainingDays.length}</strong>
+              <span>days</span>
+            </div>
+          </div>
+          <div className="overview-details">
+            <h2>Main training days</h2>
+            <p>{completedDays} of {mainTrainingDays.length} completed</p>
+            <div className="overview-progress">
+              <span style={{ width: `${mainProgressPercent}%` }} />
+            </div>
+            <div className="week-dots" aria-label="Week days">
+              {SHORT_DAY_NAMES.map((day, index) => {
+                const dayPlan = weeklyPlan[(index + 1) % 7];
+                const progress = dayPlan ? getDayProgress(dayPlan, currentWeekLogs) : null;
+
+                return (
+                  <span
+                    className={progress?.isComplete ? "week-dot done" : index === 0 ? "week-dot active" : "week-dot"}
+                    key={`${day}-${index}`}
+                  >
+                    {day}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="week-section" aria-label="This week">
+          <div className="section-heading">
+            <h2>This week</h2>
+            <span>
+              <AppIcon name="calendar-small" />
+              {currentWeekRange}
+            </span>
+          </div>
+
+          <div className="week-list">
           {weeklyPlan.map((item) => {
             const progress = getDayProgress(item, currentWeekLogs);
+            const percent = progress.total > 0
+              ? Math.round((progress.completed / progress.total) * 100)
+              : 0;
+            const statusText = progress.total === 0
+              ? "Open"
+              : progress.isComplete
+                ? "Complete"
+                : "In progress";
 
             return (
-              <article className="tile" key={item.day} data-day={item.day}>
+              <article
+                className="tile clickable"
+                key={item.day}
+                data-day={item.day}
+                onClick={() => openWorkoutDay(item)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    openWorkoutDay(item);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+              >
                 <div className="tile-header">
                   <h2>{item.day}</h2>
                   <span className={progress.isComplete ? "badge done" : "badge"}>
-                    {progress.total === 0
-                      ? "Open"
-                      : progress.isComplete
-                        ? "Complete"
-                        : "In progress"}
+                    {statusText}
+                  </span>
+                  <span className="tile-menu" aria-hidden="true">
+                    <span />
+                    <span />
+                    <span />
                   </span>
                 </div>
 
-                <div className="summary">
-                  <p>
-                    <strong>Workout:</strong> {item.workoutSummary}
-                  </p>
-                  <p>{item.workoutDescription}</p>
+                <div className="tile-body">
+                  <div className="workout-icon" aria-hidden="true">
+                    <WorkoutIcon type={getWorkoutIcon(item)} />
+                  </div>
+                  <div className="summary">
+                    <p className="workout-title">{getWorkoutLabel(item.workoutSummary)}</p>
+                    <p className="workout-meta">{getWorkoutMeta(item.workoutSummary)}</p>
+                    <p>{item.workoutDescription}</p>
+                  </div>
+                  <span className="tile-arrow" aria-hidden="true">
+                    <AppIcon name="arrow" />
+                  </span>
                 </div>
 
                 <div className="tracking">
-                  <p className="progress-line">
-                    {progress.total > 0
-                      ? `${progress.completed}/${progress.total} exercises completed this week`
-                      : "Use this day for recovery, mobility, or an optional extra session."}
-                  </p>
+                  <div className="progress-row">
+                    <p className="progress-line">
+                      {progress.total > 0
+                        ? `${progress.completed}/${progress.total} exercises completed`
+                        : "Recovery or optional session"}
+                    </p>
+                    <span>{percent}%</span>
+                  </div>
+                  <div className="card-progress">
+                    <span style={{ width: `${percent}%` }} />
+                  </div>
                 </div>
-
-                <button className="primary-button" onClick={() => openWorkoutDay(item)}>
-                  View workout
-                </button>
               </article>
             );
           })}
+          </div>
         </section>
       </main>
+
+      <button className="floating-log-button" type="button" onClick={() => openWorkoutDay(weeklyPlan[0])}>
+        <span aria-hidden="true">+</span>
+        Log Workout
+      </button>
+
+      <nav className="bottom-nav" aria-label="Primary">
+        {NAV_ITEMS.map((item, index) => (
+          <button className={index === 0 ? "active" : ""} type="button" key={item.label}>
+            <AppIcon name={item.icon} />
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
 
       {selectedDay ? (
         <div className="screen-backdrop">
