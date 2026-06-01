@@ -3,6 +3,9 @@ import { weeklyPlan } from "./data";
 
 const WORKOUT_LOGS_KEY = "fitness-tracker-workout-logs-v1";
 const WORKOUT_LOGS_API_URL = "/api/workout-logs";
+const SESSION_API_URL = "/api/session";
+const LOGIN_API_URL = "/api/login";
+const LOGOUT_API_URL = "/api/logout";
 const DAY_NAMES = [
   "Sunday",
   "Monday",
@@ -296,6 +299,93 @@ async function saveWorkoutLogsToApi(workoutLogs) {
   }
 }
 
+async function fetchSession() {
+  const response = await fetch(SESSION_API_URL);
+
+  if (!response.ok) {
+    throw new Error("Could not check login");
+  }
+
+  return response.json();
+}
+
+async function login(username, password) {
+  const response = await fetch(LOGIN_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ username, password })
+  });
+
+  if (!response.ok) {
+    throw new Error("Incorrect username or password");
+  }
+}
+
+async function logout() {
+  await fetch(LOGOUT_API_URL, { method: "POST" });
+}
+
+function LoginScreen({ onLogin }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError("");
+    setSubmitting(true);
+
+    try {
+      await login(username, password);
+      onLogin();
+    } catch (loginError) {
+      setError(loginError.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <main className="login-page">
+      <section className="login-panel">
+        <p className="eyebrow">Personal fitness dashboard</p>
+        <h1>Welcome back</h1>
+        <p className="login-copy">Log in to view your workouts and keep your progress synced.</p>
+
+        <form className="login-form" onSubmit={handleSubmit}>
+          <label>
+            <span>Username</span>
+            <input
+              autoComplete="username"
+              onChange={(event) => setUsername(event.target.value)}
+              required
+              type="text"
+              value={username}
+            />
+          </label>
+          <label>
+            <span>Password</span>
+            <input
+              autoComplete="current-password"
+              onChange={(event) => setPassword(event.target.value)}
+              required
+              type="password"
+              value={password}
+            />
+          </label>
+          {error ? <p className="login-error">{error}</p> : null}
+          <button disabled={submitting} type="submit">
+            {submitting ? "Logging in..." : "Log in"}
+          </button>
+        </form>
+      </section>
+    </main>
+  );
+}
+
 function getExerciseItemsFromSections(sections) {
   return sections
     .flatMap((section) => section.items)
@@ -348,6 +438,7 @@ function getDayProgress(dayPlan, weeklyLogs) {
 
 function App() {
   const [workoutLogs, setWorkoutLogs] = useState(getInitialWorkoutLogs);
+  const [authentication, setAuthentication] = useState("checking");
   const [apiSyncReady, setApiSyncReady] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedExercise, setSelectedExercise] = useState(null);
@@ -363,9 +454,23 @@ function App() {
   const todayName = DAY_NAMES[new Date().getDay()];
 
   useEffect(() => {
+    fetchSession()
+      .then((session) => {
+        setAuthentication(session.authenticated ? "authenticated" : "anonymous");
+      })
+      .catch(() => {
+        setAuthentication("authenticated");
+      });
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
 
     async function loadWorkoutLogs() {
+      if (authentication !== "authenticated") {
+        return;
+      }
+
       try {
         const remoteWorkoutLogs = await fetchWorkoutLogsFromApi();
 
@@ -386,7 +491,7 @@ function App() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [authentication]);
 
   useEffect(() => {
     window.localStorage.setItem(WORKOUT_LOGS_KEY, JSON.stringify(workoutLogs));
@@ -440,6 +545,12 @@ function App() {
     setSelectedWorkoutMode("gym");
   };
 
+  const handleLogout = async () => {
+    await logout();
+    setApiSyncReady(false);
+    setAuthentication("anonymous");
+  };
+
   const selectedExerciseLog =
     selectedDay && selectedExercise
       ? currentWeekLogs?.[selectedDay.day]?.[selectedExercise.name] ?? {}
@@ -467,6 +578,14 @@ function App() {
       ? selectedDay.homeAlternative
       : selectedDay;
 
+  if (authentication === "checking") {
+    return <div className="app-loading">Loading...</div>;
+  }
+
+  if (authentication === "anonymous") {
+    return <LoginScreen onLogin={() => setAuthentication("authenticated")} />;
+  }
+
   return (
     <div className="app-shell">
       <header className="dashboard-hero">
@@ -478,9 +597,8 @@ function App() {
             week automatically.
           </p>
         </div>
-        <button className="icon-button notification-button" type="button" aria-label="Notifications">
-          <AppIcon name="bell" />
-          <span aria-hidden="true" />
+        <button className="logout-button" onClick={handleLogout} type="button">
+          Log out
         </button>
       </header>
 

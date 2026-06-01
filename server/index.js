@@ -1,5 +1,5 @@
 import { createServer } from "node:http";
-import { timingSafeEqual } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { extname, join, relative, resolve } from "node:path";
 import { getState, setState } from "./db.js";
@@ -10,6 +10,9 @@ const DIST_DIR = resolve("dist");
 const WORKOUT_LOGS_STATE_KEY = "workout_logs";
 const APP_USERNAME = process.env.APP_USERNAME;
 const APP_PASSWORD = process.env.APP_PASSWORD;
+const SESSION_SECRET = process.env.SESSION_SECRET ?? APP_PASSWORD;
+const SESSION_COOKIE_NAME = "fitness_session";
+const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 const MAX_REQUEST_BODY_BYTES = 1024 * 1024;
 
 const contentTypes = {
@@ -34,33 +37,52 @@ function safeCompare(left, right) {
   return leftBuffer.length === rightBuffer.length && timingSafeEqual(leftBuffer, rightBuffer);
 }
 
-function isAuthorized(request) {
+function getCookies(request) {
+  return Object.fromEntries(
+    String(request.headers.cookie ?? "")
+      .split(";")
+      .map((cookie) => cookie.trim().split("="))
+      .filter(([name, value]) => name && value)
+  );
+}
+
+function sign(value) {
+  return createHmac("sha256", SESSION_SECRET).update(value).digest("base64url");
+}
+
+function createSessionToken() {
+  const expiresAt = Date.now() + SESSION_MAX_AGE_SECONDS * 1000;
+
+  return `${expiresAt}.${sign(String(expiresAt))}`;
+}
+
+function hasValidSession(request) {
   if (!APP_USERNAME || !APP_PASSWORD) {
     return true;
   }
 
-  const authorization = request.headers.authorization;
+  const token = getCookies(request)[SESSION_COOKIE_NAME];
+  const [expiresAt = "", signature = ""] = String(token ?? "").split(".");
 
-  if (!authorization?.startsWith("Basic ")) {
+  if (!expiresAt || Number(expiresAt) <= Date.now()) {
     return false;
   }
 
-  const [username = "", password = ""] = Buffer.from(
-    authorization.slice("Basic ".length),
-    "base64"
-  )
-    .toString("utf8")
-    .split(":");
-
-  return safeCompare(username, APP_USERNAME) && safeCompare(password, APP_PASSWORD);
+  return safeCompare(signature, sign(expiresAt));
 }
 
-function sendUnauthorized(response) {
-  response.writeHead(401, {
-    "Content-Type": "text/plain; charset=utf-8",
-    "WWW-Authenticate": 'Basic realm="Fitness App"'
-  });
-  response.end("Authentication required");
+function setSessionCookie(response, token) {
+  response.setHeader(
+    "Set-Cookie",
+    `${SESSION_COOKIE_NAME}=${token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${SESSION_MAX_AGE_SECONDS}`
+  );
+}
+
+function clearSessionCookie(response) {
+  response.setHeader(
+    "Set-Cookie",
+    `${SESSION_COOKIE_NAME}=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0`
+  );
 }
 
 async function readJsonBody(request) {
@@ -121,12 +143,43 @@ const server = createServer(async (request, response) => {
     return;
   }
 
-  if (!isAuthorized(request)) {
-    sendUnauthorized(response);
-    return;
-  }
-
   try {
+    if (url.pathname === "/api/session" && request.method === "GET") {
+      sendJson(response, 200, { authenticated: hasValidSession(request) });
+      return;
+    }
+
+    if (url.pathname === "/api/login" && request.method === "POST") {
+      const body = await readJsonBody(request);
+      const username = String(body?.username ?? "");
+      const password = String(body?.password ?? "");
+
+      if (!APP_USERNAME || !APP_PASSWORD) {
+        sendJson(response, 200, { authenticated: true });
+        return;
+      }
+
+      if (!safeCompare(username, APP_USERNAME) || !safeCompare(password, APP_PASSWORD)) {
+        sendJson(response, 401, { error: "Incorrect username or password" });
+        return;
+      }
+
+      setSessionCookie(response, createSessionToken());
+      sendJson(response, 200, { authenticated: true });
+      return;
+    }
+
+    if (url.pathname === "/api/logout" && request.method === "POST") {
+      clearSessionCookie(response);
+      sendJson(response, 200, { authenticated: false });
+      return;
+    }
+
+    if (url.pathname.startsWith("/api/") && !hasValidSession(request)) {
+      sendJson(response, 401, { error: "Authentication required" });
+      return;
+    }
+
     if (url.pathname === "/api/workout-logs" && request.method === "GET") {
       sendJson(response, 200, { workoutLogs: getState(WORKOUT_LOGS_STATE_KEY, {}) });
       return;
