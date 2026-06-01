@@ -8,7 +8,7 @@ User=fitness-app
 Group=fitness-app
 WorkingDirectory=/opt/fitness-app
 EnvironmentFile=/etc/fitness-app.env
-ExecStart=/usr/bin/node server/index.js
+ExecStart=/usr/local/bin/node server/index.js
 Restart=on-failure
 RestartSec=5
 
