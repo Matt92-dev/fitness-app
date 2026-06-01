@@ -16,11 +16,29 @@ Start the dev server:
 npm run dev
 ```
 
+Start the local API server in a second terminal:
+
+```bash
+npm run dev:api
+```
+
 Create a production build:
 
 ```bash
 npm run build
 ```
+
+Run the production server after building:
+
+```bash
+npm start
+```
+
+The API stores workout logs in `data/fitness.sqlite`. The `data` folder is ignored by Git so local or VPS workout data is not committed.
+
+## VPS deployment
+
+The production deployment templates are in `deploy/`. See `deploy/README.md` for the Ubuntu/Debian setup, systemd service, Caddy HTTPS proxy, and private-access configuration.
 
 ## Recommended GitHub workflow
 
@@ -64,6 +82,6 @@ Each push to `main` will build the app and deploy it automatically.
 ## Notes
 
 - The Vite config uses a relative base path, which keeps deployment simple on GitHub Pages.
-- Progress is stored in local storage in the browser.
-- If you later want data sync across devices, Supabase would be a strong next step.
+- Progress still falls back to local storage in the browser if the API is unavailable.
+- The local API stores workout logs in SQLite as the first step toward VPS-backed sync.
 - This is line is to trigger a test deployment

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { weeklyPlan } from "./data";
 
 const WORKOUT_LOGS_KEY = "fitness-tracker-workout-logs-v1";
+const WORKOUT_LOGS_API_URL = "/api/workout-logs";
 const DAY_NAMES = [
   "Sunday",
   "Monday",
@@ -163,28 +164,6 @@ function getWorkoutMeta(summary) {
   return match ? match[1].replace(",", "  •") : "Open";
 }
 
-function getWorkoutIcon(dayPlan) {
-  const summary = dayPlan.workoutSummary.toLowerCase();
-
-  if (summary.includes("push")) {
-    return "push";
-  }
-
-  if (summary.includes("pull")) {
-    return "pull";
-  }
-
-  if (summary.includes("leg")) {
-    return "legs";
-  }
-
-  if (summary.includes("recovery") || summary.includes("rest")) {
-    return "recovery";
-  }
-
-  return "workout";
-}
-
 function AppIcon({ name }) {
   if (name === "home") {
     return (
@@ -256,57 +235,6 @@ function AppIcon({ name }) {
   return null;
 }
 
-function WorkoutIcon({ type }) {
-  if (type === "push") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M8 7h8l2 4-2 7H8l-2-7 2-4Z" />
-        <path d="M8 7 6 4" />
-        <path d="m16 7 2-3" />
-        <path d="M9 11h6" />
-      </svg>
-    );
-  }
-
-  if (type === "pull") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M6 15c2.5-5.5 6-8.5 11-8" />
-        <path d="M7 14c2 0 3.5 1.2 4 3" />
-        <path d="M12 8c1.5 1.4 3.4 2 6 1.6" />
-        <path d="M5 18h12" />
-      </svg>
-    );
-  }
-
-  if (type === "legs") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M8 4v6l-3 9" />
-        <path d="M14 4v5l4 10" />
-        <path d="M7 19h4" />
-        <path d="M16 19h4" />
-        <path d="M8 10h6" />
-      </svg>
-    );
-  }
-
-  if (type === "recovery") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M19 15.5A7.5 7.5 0 0 1 8.5 5 8 8 0 1 0 19 15.5Z" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24">
-      <path d="M12 5v14" />
-      <path d="M5 12h14" />
-    </svg>
-  );
-}
-
 function getMostRecentExerciseLog(workoutLogs, currentWeekKey, day, exerciseName) {
   const weekKeys = Object.keys(workoutLogs)
     .filter((key) => key < currentWeekKey)
@@ -335,6 +263,36 @@ function getInitialWorkoutLogs() {
     return JSON.parse(saved);
   } catch {
     return {};
+  }
+}
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+async function fetchWorkoutLogsFromApi() {
+  const response = await fetch(WORKOUT_LOGS_API_URL);
+
+  if (!response.ok) {
+    throw new Error("Could not load workout logs");
+  }
+
+  const body = await response.json();
+
+  return isPlainObject(body.workoutLogs) ? body.workoutLogs : {};
+}
+
+async function saveWorkoutLogsToApi(workoutLogs) {
+  const response = await fetch(WORKOUT_LOGS_API_URL, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ workoutLogs })
+  });
+
+  if (!response.ok) {
+    throw new Error("Could not save workout logs");
   }
 }
 
@@ -390,6 +348,7 @@ function getDayProgress(dayPlan, weeklyLogs) {
 
 function App() {
   const [workoutLogs, setWorkoutLogs] = useState(getInitialWorkoutLogs);
+  const [apiSyncReady, setApiSyncReady] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [selectedWorkoutMode, setSelectedWorkoutMode] = useState("gym");
@@ -401,10 +360,45 @@ function App() {
   ).length;
   const mainProgressPercent = Math.round((completedDays / mainTrainingDays.length) * 100);
   const currentWeekRange = getCurrentWeekRange();
+  const todayName = DAY_NAMES[new Date().getDay()];
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadWorkoutLogs() {
+      try {
+        const remoteWorkoutLogs = await fetchWorkoutLogsFromApi();
+
+        if (!cancelled && Object.keys(remoteWorkoutLogs).length > 0) {
+          setWorkoutLogs(remoteWorkoutLogs);
+        }
+      } catch {
+        // The app can still run from localStorage when the API is unavailable.
+      } finally {
+        if (!cancelled) {
+          setApiSyncReady(true);
+        }
+      }
+    }
+
+    loadWorkoutLogs();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     window.localStorage.setItem(WORKOUT_LOGS_KEY, JSON.stringify(workoutLogs));
-  }, [workoutLogs]);
+
+    if (!apiSyncReady) {
+      return;
+    }
+
+    saveWorkoutLogsToApi(workoutLogs).catch(() => {
+      // Keep localStorage as the durable fallback if the API save fails.
+    });
+  }, [apiSyncReady, workoutLogs]);
 
   useEffect(() => {
     if (!selectedDay) {
@@ -492,33 +486,42 @@ function App() {
 
       <main className="dashboard-main">
         <section className="overview-card" aria-label="Main training days progress">
-          <div className="progress-ring" style={{ "--progress": `${mainProgressPercent}%` }}>
-            <div>
-              <strong>{completedDays}/{mainTrainingDays.length}</strong>
-              <span>days</span>
+          <div className="overview-topline">
+            <div className="progress-ring" style={{ "--progress": `${mainProgressPercent}%` }}>
+              <div>
+                <strong>{completedDays}/{mainTrainingDays.length}</strong>
+                <span>days</span>
+              </div>
+            </div>
+            <div className="overview-details">
+              <h2>Main training days</h2>
+              <p>{completedDays} of {mainTrainingDays.length} completed</p>
+              <div className="overview-progress">
+                <span style={{ width: `${mainProgressPercent}%` }} />
+              </div>
             </div>
           </div>
-          <div className="overview-details">
-            <h2>Main training days</h2>
-            <p>{completedDays} of {mainTrainingDays.length} completed</p>
-            <div className="overview-progress">
-              <span style={{ width: `${mainProgressPercent}%` }} />
-            </div>
             <div className="week-dots" aria-label="Week days">
               {SHORT_DAY_NAMES.map((day, index) => {
                 const dayPlan = weeklyPlan[(index + 1) % 7];
                 const progress = dayPlan ? getDayProgress(dayPlan, currentWeekLogs) : null;
+                const classes = [
+                  "week-dot",
+                  dayPlan?.day === todayName ? "active" : "",
+                  progress?.isComplete ? "done" : ""
+                ]
+                  .filter(Boolean)
+                  .join(" ");
 
                 return (
                   <span
-                    className={progress?.isComplete ? "week-dot done" : index === 0 ? "week-dot active" : "week-dot"}
+                    className={classes}
                     key={`${day}-${index}`}
                   >
-                    {day}
-                  </span>
-                );
-              })}
-            </div>
+                  {day}
+                </span>
+              );
+            })}
           </div>
         </section>
 
@@ -531,7 +534,7 @@ function App() {
             </span>
           </div>
 
-          <div className="week-list">
+          <div className="workout-carousel">
           {weeklyPlan.map((item) => {
             const progress = getDayProgress(item, currentWeekLogs);
             const percent = progress.total > 0
@@ -571,9 +574,6 @@ function App() {
                 </div>
 
                 <div className="tile-body">
-                  <div className="workout-icon" aria-hidden="true">
-                    <WorkoutIcon type={getWorkoutIcon(item)} />
-                  </div>
                   <div className="summary">
                     <p className="workout-title">{getWorkoutLabel(item.workoutSummary)}</p>
                     <p className="workout-meta">{getWorkoutMeta(item.workoutSummary)}</p>
@@ -603,11 +603,6 @@ function App() {
           </div>
         </section>
       </main>
-
-      <button className="floating-log-button" type="button" onClick={() => openWorkoutDay(weeklyPlan[0])}>
-        <span aria-hidden="true">+</span>
-        Log Workout
-      </button>
 
       <nav className="bottom-nav" aria-label="Primary">
         {NAV_ITEMS.map((item, index) => (
