@@ -1,4 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowRight,
+  faBell,
+  faCalendarDays,
+  faChartColumn,
+  faDumbbell,
+  faFireFlameCurved,
+  faGear,
+  faHouse
+} from "@fortawesome/free-solid-svg-icons";
 import { weeklyPlan } from "./data";
 
 const WORKOUT_LOGS_KEY = "fitness-tracker-workout-logs-v1";
@@ -21,7 +32,7 @@ const NAV_ITEMS = [
   { label: "Dashboard", icon: "home" },
   { label: "Progress", icon: "progress" },
   { label: "History", icon: "calendar" },
-  { label: "Profile", icon: "profile" }
+  { label: "More", icon: "profile" }
 ];
 
 function getWeekKey(date = new Date()) {
@@ -168,74 +179,19 @@ function getWorkoutMeta(summary) {
 }
 
 function AppIcon({ name }) {
-  if (name === "home") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1v-9.5Z" />
-      </svg>
-    );
-  }
+  const icons = {
+    home: faHouse,
+    progress: faChartColumn,
+    calendar: faCalendarDays,
+    profile: faGear,
+    bell: faBell,
+    "calendar-small": faCalendarDays,
+    arrow: faArrowRight,
+    dumbbell: faDumbbell,
+    streak: faFireFlameCurved
+  };
 
-  if (name === "progress") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M5 19V11" />
-        <path d="M12 19V5" />
-        <path d="M19 19v-8" />
-        <path d="M4 19h16" />
-      </svg>
-    );
-  }
-
-  if (name === "calendar") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M7 3v4" />
-        <path d="M17 3v4" />
-        <path d="M4 9h16" />
-        <path d="M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" />
-      </svg>
-    );
-  }
-
-  if (name === "profile") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
-        <path d="M4.5 20a8 8 0 0 1 15 0" />
-      </svg>
-    );
-  }
-
-  if (name === "bell") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z" />
-        <path d="M10 21h4" />
-      </svg>
-    );
-  }
-
-  if (name === "calendar-small") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M7 3v4" />
-        <path d="M17 3v4" />
-        <path d="M4 9h16" />
-        <path d="M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" />
-      </svg>
-    );
-  }
-
-  if (name === "arrow") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="m9 5 7 7-7 7" />
-      </svg>
-    );
-  }
-
-  return null;
+  return icons[name] ? <FontAwesomeIcon aria-hidden="true" icon={icons[name]} /> : null;
 }
 
 function getMostRecentExerciseLog(workoutLogs, currentWeekKey, day, exerciseName) {
@@ -436,6 +392,281 @@ function getDayProgress(dayPlan, weeklyLogs) {
   };
 }
 
+function getAllExercises() {
+  const exercises = new Map();
+
+  weeklyPlan.forEach((dayPlan) => {
+    getExerciseItems(dayPlan).forEach((exercise) => {
+      exercises.set(exercise.name, exercise);
+    });
+    if (dayPlan.homeAlternative) {
+      getExerciseItemsFromSections(dayPlan.homeAlternative.detailSections).forEach((exercise) => {
+        exercises.set(exercise.name, exercise);
+      });
+    }
+  });
+
+  return [...exercises.values()];
+}
+
+function getHistoryEntries(workoutLogs) {
+  return Object.entries(workoutLogs)
+    .flatMap(([weekKey, weekLogs]) => weeklyPlan.flatMap((dayPlan) => {
+      const gymExercises = getExerciseItems(dayPlan);
+      const homeExercises = dayPlan.homeAlternative
+        ? getExerciseItemsFromSections(dayPlan.homeAlternative.detailSections)
+        : [];
+      const gymProgress = getExerciseProgress(dayPlan.day, gymExercises, weekLogs ?? {});
+      const homeProgress = getExerciseProgress(dayPlan.day, homeExercises, weekLogs ?? {});
+      const usesHomeWorkout = homeProgress.isComplete || homeProgress.completed > gymProgress.completed;
+      const progress = usesHomeWorkout ? homeProgress : gymProgress;
+
+      if (progress.completed === 0) {
+        return [];
+      }
+
+      const date = getDateForWeekDay(weekKey, dayPlan.day);
+      return [{
+        dayPlan,
+        date,
+        exercises: usesHomeWorkout ? homeExercises : gymExercises,
+        progress,
+        weekKey,
+        weekLogs,
+        workoutMode: usesHomeWorkout ? "Home" : "Gym"
+      }];
+    }))
+    .sort((first, second) => (second.date?.getTime() ?? 0) - (first.date?.getTime() ?? 0));
+}
+
+function getWeeklyStreak(workoutLogs, currentWeekKey) {
+  const mainTrainingDays = weeklyPlan.filter((dayPlan) => getExerciseItems(dayPlan).length > 0);
+  let streak = 0;
+  let weekKey = currentWeekKey;
+
+  while (weekKey) {
+    const weekLogs = workoutLogs[weekKey] ?? {};
+    const trainedThatWeek = mainTrainingDays.some((dayPlan) =>
+      getDayProgress(dayPlan, weekLogs).completed > 0
+    );
+
+    if (!trainedThatWeek) {
+      break;
+    }
+
+    streak += 1;
+    const monday = getDateForWeekDay(weekKey, "Monday");
+    if (!monday) {
+      break;
+    }
+    weekKey = getWeekKey(new Date(monday.getTime() - 7 * 86400000));
+  }
+
+  return streak;
+}
+
+function formatWorkoutDate(date) {
+  if (!date) {
+    return "Earlier workout";
+  }
+
+  return new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "short"
+  }).format(date);
+}
+
+function downloadWorkoutBackup(workoutLogs) {
+  const backup = new Blob([JSON.stringify(workoutLogs, null, 2)], {
+    type: "application/json"
+  });
+  const url = URL.createObjectURL(backup);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `fitness-workout-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function ProgressView({ workoutLogs }) {
+  const allExercises = getAllExercises();
+  const bestLifts = allExercises
+    .map((exercise) => ({ exercise, entry: getBestExerciseLog(workoutLogs, exercise.name) }))
+    .filter(({ entry }) => entry?.weight)
+    .sort(({ exercise: first }, { exercise: second }) => first.name.localeCompare(second.name));
+  const historyEntries = getHistoryEntries(workoutLogs);
+  const completedSessions = historyEntries.filter(({ progress }) => progress.isComplete).length;
+  const activeWeeks = new Set(historyEntries.map(({ weekKey }) => weekKey)).size;
+
+  return (
+    <main className="dashboard-main app-view">
+      <section className="view-intro">
+        <p className="eyebrow">Training insights</p>
+        <h2>Progress</h2>
+        <p>Your strongest recorded lifts and the consistency you have built so far.</p>
+      </section>
+
+      <section className="stats-grid" aria-label="Progress summary">
+        <article className="stat-card">
+          <strong>{completedSessions}</strong>
+          <span>completed workouts</span>
+        </article>
+        <article className="stat-card">
+          <strong>{activeWeeks}</strong>
+          <span>active weeks</span>
+        </article>
+        <article className="stat-card">
+          <strong>{bestLifts.length}</strong>
+          <span>lifts with a best</span>
+        </article>
+      </section>
+
+      <section className="content-section">
+        <div className="section-heading">
+          <h2>Personal bests</h2>
+          <span>{bestLifts.length} recorded</span>
+        </div>
+        {bestLifts.length ? (
+          <div className="best-list">
+            {bestLifts.map(({ exercise, entry }) => (
+              <article className="best-row" key={exercise.name}>
+                <div>
+                  <h3>{exercise.name}</h3>
+                  <p>{entry.reps ? `${entry.reps} reps` : "Weight recorded"}</p>
+                </div>
+                <strong>{entry.weight}</strong>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="empty-state">Log a weighted exercise and your personal bests will appear here.</p>
+        )}
+      </section>
+    </main>
+  );
+}
+
+function HistoryView({ onSelect, workoutLogs }) {
+  const historyEntries = getHistoryEntries(workoutLogs);
+
+  return (
+    <main className="dashboard-main app-view">
+      <section className="view-intro">
+        <p className="eyebrow">Your training record</p>
+        <h2>History</h2>
+        <p>Every workout you have started, with the details saved exactly as you logged them.</p>
+      </section>
+
+      <section className="history-list" aria-label="Workout history">
+        {historyEntries.length ? historyEntries.map((entry) => {
+          const percent = Math.round((entry.progress.completed / entry.progress.total) * 100);
+          return (
+            <button className="history-row" key={`${entry.weekKey}-${entry.dayPlan.day}`} onClick={() => onSelect(entry)} type="button">
+              <div>
+                <p className="history-date">{formatWorkoutDate(entry.date)}</p>
+                <h3>{getWorkoutLabel(entry.dayPlan.workoutSummary)}</h3>
+                <p>{entry.progress.completed}/{entry.progress.total} exercises logged</p>
+              </div>
+              <div className="history-status">
+                <strong>{percent}%</strong>
+                <AppIcon name="arrow" />
+              </div>
+            </button>
+          );
+        }) : (
+          <p className="empty-state">Your completed and in-progress workouts will appear here once you start logging.</p>
+        )}
+      </section>
+    </main>
+  );
+}
+
+function MoreView({ onExport, onLogout, onImport }) {
+  const importInput = useRef(null);
+
+  return (
+    <main className="dashboard-main app-view">
+      <section className="view-intro">
+        <p className="eyebrow">App settings</p>
+        <h2>More</h2>
+        <p>Keep a copy of your training record or manage this private app.</p>
+      </section>
+
+      <section className="settings-list">
+        <button className="settings-row" onClick={onExport} type="button">
+          <span><strong>Export workout backup</strong><small>Download all of your saved workout logs.</small></span>
+          <AppIcon name="arrow" />
+        </button>
+        <button className="settings-row" onClick={() => importInput.current?.click()} type="button">
+          <span><strong>Restore workout backup</strong><small>Replace local logs with a backup file.</small></span>
+          <AppIcon name="arrow" />
+        </button>
+        <input accept="application/json" className="visually-hidden" onChange={onImport} ref={importInput} type="file" />
+        <button className="settings-row danger" onClick={onLogout} type="button">
+          <span><strong>Log out</strong><small>End this session on this device.</small></span>
+          <AppIcon name="arrow" />
+        </button>
+      </section>
+    </main>
+  );
+}
+
+function WorkoutTile({ item, onOpen, progress }) {
+  const percent = progress.total > 0
+    ? Math.round((progress.completed / progress.total) * 100)
+    : 0;
+  const statusText = progress.total === 0
+    ? "Open"
+    : progress.isComplete
+      ? "Complete"
+      : "In progress";
+  return (
+    <article
+      className="tile clickable"
+      data-day={item.day}
+      onClick={() => onOpen(item)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onOpen(item);
+        }
+      }}
+      role="button"
+      tabIndex={0}
+    >
+      <div className="tile-header">
+        <h2>{item.day}</h2>
+        <span className={progress.isComplete ? "badge done" : "badge"}>{statusText}</span>
+      </div>
+
+      <div className="tile-body">
+        <div className="summary">
+          <div className="workout-summary-top">
+            <span className="workout-symbol"><AppIcon name="dumbbell" /></span>
+            <div>
+              <p className="workout-title">{getWorkoutLabel(item.workoutSummary)}</p>
+              <p className="workout-meta">{getWorkoutMeta(item.workoutSummary)}</p>
+            </div>
+          </div>
+          <p>{item.workoutDescription}</p>
+        </div>
+        <span className="tile-arrow" aria-hidden="true"><AppIcon name="arrow" /></span>
+      </div>
+
+      <div className="tracking">
+        <div className="progress-row">
+          <p className="progress-line">
+            {progress.total > 0 ? `${progress.completed}/${progress.total} exercises completed` : "Recovery or optional session"}
+          </p>
+          <span>{percent}%</span>
+        </div>
+        <div className="card-progress"><span style={{ width: `${percent}%` }} /></div>
+      </div>
+    </article>
+  );
+}
+
 function App() {
   const [workoutLogs, setWorkoutLogs] = useState(getInitialWorkoutLogs);
   const [authentication, setAuthentication] = useState("checking");
@@ -443,6 +674,8 @@ function App() {
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [selectedWorkoutMode, setSelectedWorkoutMode] = useState("gym");
+  const [activeTab, setActiveTab] = useState("Dashboard");
+  const [selectedHistoryEntry, setSelectedHistoryEntry] = useState(null);
   const currentWeekKey = getWeekKey();
   const currentWeekLogs = workoutLogs[currentWeekKey] ?? {};
   const mainTrainingDays = weeklyPlan.filter((dayPlan) => getExerciseItems(dayPlan).length > 0);
@@ -452,6 +685,12 @@ function App() {
   const mainProgressPercent = Math.round((completedDays / mainTrainingDays.length) * 100);
   const currentWeekRange = getCurrentWeekRange();
   const todayName = DAY_NAMES[new Date().getDay()];
+  const historyEntries = getHistoryEntries(workoutLogs);
+  const completedSessions = historyEntries.filter(({ progress }) => progress.isComplete).length;
+  const activeWeeks = new Set(historyEntries.map(({ weekKey }) => weekKey)).size;
+  const weeklyStreak = getWeeklyStreak(workoutLogs, currentWeekKey);
+  const todayWorkout = weeklyPlan.find((item) => item.day === todayName) ?? weeklyPlan[0];
+  const weekWorkouts = [todayWorkout, ...weeklyPlan.filter((item) => item.day !== todayWorkout.day)];
 
   useEffect(() => {
     fetchSession()
@@ -551,6 +790,27 @@ function App() {
     setAuthentication("anonymous");
   };
 
+  const handleImportBackup = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      const importedLogs = JSON.parse(await file.text());
+      if (!isPlainObject(importedLogs)) {
+        throw new Error("Invalid backup");
+      }
+      if (window.confirm("Replace the workout logs on this device with this backup?")) {
+        setWorkoutLogs(importedLogs);
+      }
+    } catch {
+      window.alert("That backup file could not be read.");
+    }
+  };
+
   const selectedExerciseLog =
     selectedDay && selectedExercise
       ? currentWeekLogs?.[selectedDay.day]?.[selectedExercise.name] ?? {}
@@ -588,38 +848,43 @@ function App() {
 
   return (
     <div className="app-shell">
-      <header className="dashboard-hero">
-        <div className="hero-copy-block">
-          <p className="eyebrow">Personal fitness dashboard</p>
-          <h1>Weekly Workout Tracker</h1>
-          <p className="hero-copy">
-            Focus on the workout, log what you lift, and let the app roll into a fresh
-            week automatically.
-          </p>
-        </div>
-        <button className="logout-button" onClick={handleLogout} type="button">
-          Log out
-        </button>
-      </header>
+      {activeTab === "Dashboard" ? <>
+        <header className="dashboard-hero">
+          <div className="hero-copy-block">
+            <p className="eyebrow">Personal fitness dashboard</p>
+            <h1>Weekly Workout Tracker</h1>
+            <p className="hero-copy">Stay consistent. Log your workouts and make progress week after week.</p>
+          </div>
+        </header>
 
-      <main className="dashboard-main">
-        <section className="overview-card" aria-label="Main training days progress">
-          <div className="overview-topline">
-            <div className="progress-ring" style={{ "--progress": `${mainProgressPercent}%` }}>
+        <main className="dashboard-main">
+          <section className="overview-card" aria-label="Main training days progress">
+           <div className="overview-topline">
+             <div className="progress-ring" style={{ "--progress": `${mainProgressPercent}%` }}>
               <div>
                 <strong>{completedDays}/{mainTrainingDays.length}</strong>
                 <span>days</span>
               </div>
-            </div>
-            <div className="overview-details">
-              <h2>Main training days</h2>
-              <p>{completedDays} of {mainTrainingDays.length} completed</p>
-              <div className="overview-progress">
-                <span style={{ width: `${mainProgressPercent}%` }} />
-              </div>
-            </div>
-          </div>
-            <div className="week-dots" aria-label="Week days">
+             </div>
+             <div className="overview-details">
+              <p className="overview-kicker">Weekly goal</p>
+              <h2>This week</h2>
+              <p>{currentWeekRange}</p>
+               <div className="overview-progress">
+                 <span style={{ width: `${mainProgressPercent}%` }} />
+               </div>
+              <p className="overview-progress-label">{completedDays} of {mainTrainingDays.length} workouts completed</p>
+             </div>
+           </div>
+          </section>
+
+          <section className="stats-grid dashboard-stats" aria-label="Training summary">
+            <article className="stat-card"><div className="stat-value"><AppIcon name="dumbbell" /><strong>{completedSessions}</strong></div><span>workouts completed</span></article>
+            <article className="stat-card"><div className="stat-value"><AppIcon name="calendar" /><strong>{activeWeeks}</strong></div><span>active weeks</span></article>
+            <article className="stat-card"><div className="stat-value"><AppIcon name="streak" /><strong>{weeklyStreak}</strong></div><span>week streak</span></article>
+          </section>
+
+          <div className="week-dots dashboard-week-dots" aria-label="Week days">
               {SHORT_DAY_NAMES.map((day, index) => {
                 const dayPlan = weeklyPlan[(index + 1) % 7];
                 const progress = dayPlan ? getDayProgress(dayPlan, currentWeekLogs) : null;
@@ -641,95 +906,96 @@ function App() {
               );
             })}
           </div>
-        </section>
 
-        <section className="week-section" aria-label="This week">
-          <div className="section-heading">
-            <h2>This week</h2>
-            <span>
-              <AppIcon name="calendar-small" />
-              {currentWeekRange}
-            </span>
-          </div>
+          <section className="week-section" aria-label="This week">
+            <div className="section-heading"><h2>This week</h2><span>Swipe to explore</span></div>
+           <div className="workout-carousel">
+              {weekWorkouts.map((item) => (
+                <WorkoutTile item={item} key={item.day} onOpen={openWorkoutDay} progress={getDayProgress(item, currentWeekLogs)} />
+              ))}
+           </div>
+          </section>
+        </main>
+      </> : null}
 
-          <div className="workout-carousel">
-          {weeklyPlan.map((item) => {
-            const progress = getDayProgress(item, currentWeekLogs);
-            const percent = progress.total > 0
-              ? Math.round((progress.completed / progress.total) * 100)
-              : 0;
-            const statusText = progress.total === 0
-              ? "Open"
-              : progress.isComplete
-                ? "Complete"
-                : "In progress";
-
-            return (
-              <article
-                className="tile clickable"
-                key={item.day}
-                data-day={item.day}
-                onClick={() => openWorkoutDay(item)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    openWorkoutDay(item);
-                  }
-                }}
-                role="button"
-                tabIndex={0}
-              >
-                <div className="tile-header">
-                  <h2>{item.day}</h2>
-                  <span className={progress.isComplete ? "badge done" : "badge"}>
-                    {statusText}
-                  </span>
-                  <span className="tile-menu" aria-hidden="true">
-                    <span />
-                    <span />
-                    <span />
-                  </span>
-                </div>
-
-                <div className="tile-body">
-                  <div className="summary">
-                    <p className="workout-title">{getWorkoutLabel(item.workoutSummary)}</p>
-                    <p className="workout-meta">{getWorkoutMeta(item.workoutSummary)}</p>
-                    <p>{item.workoutDescription}</p>
-                  </div>
-                  <span className="tile-arrow" aria-hidden="true">
-                    <AppIcon name="arrow" />
-                  </span>
-                </div>
-
-                <div className="tracking">
-                  <div className="progress-row">
-                    <p className="progress-line">
-                      {progress.total > 0
-                        ? `${progress.completed}/${progress.total} exercises completed`
-                        : "Recovery or optional session"}
-                    </p>
-                    <span>{percent}%</span>
-                  </div>
-                  <div className="card-progress">
-                    <span style={{ width: `${percent}%` }} />
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-          </div>
-        </section>
-      </main>
+      {activeTab === "Progress" ? <ProgressView workoutLogs={workoutLogs} /> : null}
+      {activeTab === "History" ? (
+        <HistoryView onSelect={setSelectedHistoryEntry} workoutLogs={workoutLogs} />
+      ) : null}
+      {activeTab === "More" ? (
+        <MoreView
+          onExport={() => downloadWorkoutBackup(workoutLogs)}
+          onImport={handleImportBackup}
+          onLogout={handleLogout}
+        />
+      ) : null}
 
       <nav className="bottom-nav" aria-label="Primary">
-        {NAV_ITEMS.map((item, index) => (
-          <button className={index === 0 ? "active" : ""} type="button" key={item.label}>
+        {NAV_ITEMS.map((item) => (
+          <button
+            aria-current={activeTab === item.label ? "page" : undefined}
+            className={activeTab === item.label ? "active" : ""}
+            key={item.label}
+            onClick={() => {
+              closeWorkoutFlow();
+              setSelectedHistoryEntry(null);
+              setActiveTab(item.label);
+            }}
+            type="button"
+          >
             <AppIcon name={item.icon} />
             <span>{item.label}</span>
           </button>
         ))}
       </nav>
+
+      {selectedHistoryEntry ? (
+        <div className="screen-backdrop">
+          <section className="screen-sheet" role="dialog" aria-modal="true" aria-label="Saved workout details">
+            <header className="screen-header">
+              <button className="nav-button" onClick={() => setSelectedHistoryEntry(null)} type="button">
+                Back
+              </button>
+              <div>
+                <p className="screen-kicker">Saved workout</p>
+                <h2>{formatWorkoutDate(selectedHistoryEntry.date)}</h2>
+              </div>
+            </header>
+            <div className="screen-content">
+              <div className="workout-title-row">
+                <div>
+                  <p className="detail-lead">{getWorkoutLabel(selectedHistoryEntry.dayPlan.workoutSummary)}</p>
+                  <p className="coaching-note">
+                    {selectedHistoryEntry.workoutMode} workout | {selectedHistoryEntry.progress.completed}/{selectedHistoryEntry.progress.total} exercises logged
+                  </p>
+                </div>
+              </div>
+              <section className="detail-section">
+                <div className="history-exercise-list">
+                  {selectedHistoryEntry.exercises.map((exercise) => {
+                    const log = selectedHistoryEntry.weekLogs?.[selectedHistoryEntry.dayPlan.day]?.[exercise.name];
+                    const isLogged = log?.completed || log?.weight || log?.reps;
+
+                    return (
+                      <article className="history-exercise" key={exercise.name}>
+                        <div>
+                          <h3>{exercise.name}</h3>
+                          <p>{exercise.sets}</p>
+                        </div>
+                        <p className={isLogged ? "history-log" : "history-log muted"}>
+                          {isLogged
+                            ? [log.weight, log.reps].filter(Boolean).join(" | ") || "Completed"
+                            : "Not logged"}
+                        </p>
+                      </article>
+                    );
+                  })}
+                </div>
+              </section>
+            </div>
+          </section>
+        </div>
+      ) : null}
 
       {selectedDay ? (
         <div className="screen-backdrop">
