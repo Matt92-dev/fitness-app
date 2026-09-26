@@ -10,6 +10,7 @@ const DIST_DIR = resolve("dist");
 const WORKOUT_LOGS_STATE_KEY = "workout_logs";
 const APP_USERNAME = process.env.APP_USERNAME;
 const APP_PASSWORD = process.env.APP_PASSWORD;
+const AUTHENTICATION_ENABLED = process.env.AUTHENTICATION_ENABLED === "true";
 const SESSION_SECRET = process.env.SESSION_SECRET ?? APP_PASSWORD;
 const SESSION_COOKIE_NAME = "fitness_session";
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
@@ -59,7 +60,7 @@ function createSessionToken() {
 }
 
 function hasValidSession(request) {
-  if (!APP_USERNAME || !APP_PASSWORD) {
+  if (!AUTHENTICATION_ENABLED || !APP_USERNAME || !APP_PASSWORD) {
     return true;
   }
 
@@ -156,7 +157,7 @@ const server = createServer(async (request, response) => {
       const username = String(body?.username ?? "");
       const password = String(body?.password ?? "");
 
-      if (!APP_USERNAME || !APP_PASSWORD) {
+      if (!AUTHENTICATION_ENABLED || !APP_USERNAME || !APP_PASSWORD) {
         sendJson(response, 200, { authenticated: true });
         return;
       }

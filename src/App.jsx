@@ -14,9 +14,6 @@ import { weeklyPlan } from "./data";
 
 const WORKOUT_LOGS_KEY = "fitness-tracker-workout-logs-v1";
 const WORKOUT_LOGS_API_URL = "/api/workout-logs";
-const SESSION_API_URL = "/api/session";
-const LOGIN_API_URL = "/api/login";
-const LOGOUT_API_URL = "/api/logout";
 const DAY_NAMES = [
   "Sunday",
   "Monday",
@@ -253,93 +250,6 @@ async function saveWorkoutLogsToApi(workoutLogs) {
   if (!response.ok) {
     throw new Error("Could not save workout logs");
   }
-}
-
-async function fetchSession() {
-  const response = await fetch(SESSION_API_URL);
-
-  if (!response.ok) {
-    throw new Error("Could not check login");
-  }
-
-  return response.json();
-}
-
-async function login(username, password) {
-  const response = await fetch(LOGIN_API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ username, password })
-  });
-
-  if (!response.ok) {
-    throw new Error("Incorrect username or password");
-  }
-}
-
-async function logout() {
-  await fetch(LOGOUT_API_URL, { method: "POST" });
-}
-
-function LoginScreen({ onLogin }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setError("");
-    setSubmitting(true);
-
-    try {
-      await login(username, password);
-      onLogin();
-    } catch (loginError) {
-      setError(loginError.message);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  return (
-    <main className="login-page">
-      <section className="login-panel">
-        <p className="eyebrow">Personal fitness dashboard</p>
-        <h1>Welcome back</h1>
-        <p className="login-copy">Log in to view your workouts and keep your progress synced.</p>
-
-        <form className="login-form" onSubmit={handleSubmit}>
-          <label>
-            <span>Username</span>
-            <input
-              autoComplete="username"
-              onChange={(event) => setUsername(event.target.value)}
-              required
-              type="text"
-              value={username}
-            />
-          </label>
-          <label>
-            <span>Password</span>
-            <input
-              autoComplete="current-password"
-              onChange={(event) => setPassword(event.target.value)}
-              required
-              type="password"
-              value={password}
-            />
-          </label>
-          {error ? <p className="login-error">{error}</p> : null}
-          <button disabled={submitting} type="submit">
-            {submitting ? "Logging in..." : "Log in"}
-          </button>
-        </form>
-      </section>
-    </main>
-  );
 }
 
 function getExerciseItemsFromSections(sections) {
@@ -582,7 +492,7 @@ function HistoryView({ onSelect, workoutLogs }) {
   );
 }
 
-function MoreView({ onExport, onLogout, onImport }) {
+function MoreView({ onExport, onImport }) {
   const importInput = useRef(null);
 
   return (
@@ -603,10 +513,6 @@ function MoreView({ onExport, onLogout, onImport }) {
           <AppIcon name="arrow" />
         </button>
         <input accept="application/json" className="visually-hidden" onChange={onImport} ref={importInput} type="file" />
-        <button className="settings-row danger" onClick={onLogout} type="button">
-          <span><strong>Log out</strong><small>End this session on this device.</small></span>
-          <AppIcon name="arrow" />
-        </button>
       </section>
     </main>
   );
@@ -669,7 +575,6 @@ function WorkoutTile({ item, onOpen, progress }) {
 
 function App() {
   const [workoutLogs, setWorkoutLogs] = useState(getInitialWorkoutLogs);
-  const [authentication, setAuthentication] = useState("checking");
   const [apiSyncReady, setApiSyncReady] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedExercise, setSelectedExercise] = useState(null);
@@ -693,23 +598,9 @@ function App() {
   const weekWorkouts = [todayWorkout, ...weeklyPlan.filter((item) => item.day !== todayWorkout.day)];
 
   useEffect(() => {
-    fetchSession()
-      .then((session) => {
-        setAuthentication(session.authenticated ? "authenticated" : "anonymous");
-      })
-      .catch(() => {
-        setAuthentication("authenticated");
-      });
-  }, []);
-
-  useEffect(() => {
     let cancelled = false;
 
     async function loadWorkoutLogs() {
-      if (authentication !== "authenticated") {
-        return;
-      }
-
       try {
         const remoteWorkoutLogs = await fetchWorkoutLogsFromApi();
 
@@ -730,7 +621,7 @@ function App() {
     return () => {
       cancelled = true;
     };
-  }, [authentication]);
+  }, []);
 
   useEffect(() => {
     window.localStorage.setItem(WORKOUT_LOGS_KEY, JSON.stringify(workoutLogs));
@@ -784,12 +675,6 @@ function App() {
     setSelectedWorkoutMode("gym");
   };
 
-  const handleLogout = async () => {
-    await logout();
-    setApiSyncReady(false);
-    setAuthentication("anonymous");
-  };
-
   const handleImportBackup = async (event) => {
     const file = event.target.files?.[0];
     event.target.value = "";
@@ -837,14 +722,6 @@ function App() {
     selectedDay?.homeAlternative && selectedWorkoutMode === "home"
       ? selectedDay.homeAlternative
       : selectedDay;
-
-  if (authentication === "checking") {
-    return <div className="app-loading">Loading...</div>;
-  }
-
-  if (authentication === "anonymous") {
-    return <LoginScreen onLogin={() => setAuthentication("authenticated")} />;
-  }
 
   return (
     <div className="app-shell">
@@ -926,7 +803,6 @@ function App() {
         <MoreView
           onExport={() => downloadWorkoutBackup(workoutLogs)}
           onImport={handleImportBackup}
-          onLogout={handleLogout}
         />
       ) : null}
 
